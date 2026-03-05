@@ -26,7 +26,7 @@ if "page" not in st.session_state:
     st.session_state.page = "home"
 
 # -----------------------------
-# CSS ESTILIZADO E TRAVA DE ROLAGEM
+# CSS
 # -----------------------------
 st.markdown(f"""
 <style>
@@ -87,8 +87,7 @@ st.markdown(f"""
         left: calc(50% + 15px);
         top: 72%;
         transform: translateY(-50%);
-        transition: all 0.15s ease-out;
-        display: block !important;
+        transition: left 0.2s ease, top 0.2s ease;
     }}
 
     .moving-img {{
@@ -133,46 +132,64 @@ if st.session_state.page == "home":
             st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # Injeção do Botão "Não" com Script Auto-Executável
+    # Botão Não com lógica corrigida
     st.markdown("""
         <button id="nao-button">Não 😢</button>
         
         <script>
-            (function() {
-                const initFoge = () => {
-                    const btn = document.getElementById("nao-button");
-                    if (!btn) {
-                        setTimeout(initFoge, 100);
-                        return;
+        (function() {
+
+            function init() {
+                const btn = document.getElementById("nao-button");
+                if (!btn) {
+                    setTimeout(init, 100);
+                    return;
+                }
+
+                function mover() {
+
+                    const rect = btn.getBoundingClientRect();
+                    const btnW = rect.width;
+                    const btnH = rect.height;
+
+                    const winW = window.innerWidth;
+                    const winH = window.innerHeight;
+
+                    const margem = 10;
+
+                    const maxX = winW - btnW - margem;
+                    const maxY = winH - btnH - margem;
+
+                    const newX = Math.random() * (maxX - margem) + margem;
+                    const newY = Math.random() * (maxY - margem) + margem;
+
+                    btn.style.left = newX + "px";
+                    btn.style.top = newY + "px";
+                }
+
+                document.addEventListener("mousemove", function(e) {
+
+                    const rect = btn.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+
+                    const distX = Math.abs(e.clientX - centerX);
+                    const distY = Math.abs(e.clientY - centerY);
+
+                    if (distX < 80 && distY < 50) {
+                        mover();
                     }
+                });
 
-                    const foge = (e) => {
-                        e.preventDefault();
+                btn.addEventListener("touchstart", function(e) {
+                    e.preventDefault();
+                    mover();
+                });
+            }
 
-                        const winW = window.innerWidth;
-                        const winH = window.innerHeight;
+            init();
 
-                        const btnW = btn.offsetWidth;
-                        const btnH = btn.offsetHeight;
-
-                        // Margem mínima para não colar na borda
-                        const margin = 10;
-
-                        // Posição totalmente aleatória dentro da tela visível
-                        const newX = Math.random() * (winW - btnW - margin * 2) + margin;
-                        const newY = Math.random() * (winH - btnH - margin * 2) + margin;
-
-                        btn.style.left = newX + "px";
-                        btn.style.top = newY + "px";
-                    };
-
-                    btn.addEventListener("mouseover", foge);
-                    btn.addEventListener("touchstart", foge);
-                    btn.addEventListener("click", foge);
-                };
-
-                initFoge();
-            })();
+        })();
         </script>
     """, unsafe_allow_html=True)
 
