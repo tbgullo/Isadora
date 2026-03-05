@@ -21,8 +21,6 @@ img4 = get_base64_image("Image4.jpg")
 
 if "page" not in st.session_state:
     st.session_state.page = "home"
-if "nao_position" not in st.session_state:
-    st.session_state.nao_position = {"left": "calc(50% + 15px)", "top": "72%"}
 
 # -----------------------------
 # CSS
@@ -70,16 +68,6 @@ st.markdown("""
         z-index: 10;
     }
     
-    .nao-button-container {
-        position: fixed;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: 9999;
-    }
-    
     #nao-button {
         position: fixed;
         background-color: #ffb6c1;
@@ -93,11 +81,14 @@ st.markdown("""
         font-family: Arial;
         font-weight: bold;
         box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        z-index: 10000;
-        pointer-events: auto;
-        transition: left 0.2s ease, top 0.2s ease;
+        z-index: 999999;
         text-align: center;
         user-select: none;
+        transition: left 0.1s ease, top 0.1s ease;
+        /* Posição inicial */
+        left: calc(50% + 15px);
+        top: 72%;
+        transform: translateY(-50%);
     }
     
     .moving-img {
@@ -139,69 +130,102 @@ if st.session_state.page == "home":
             st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
     
-    # Container para o botão Não
-    st.markdown(f"""
-    <div class="nao-button-container">
-        <button id="nao-button" style="left: {st.session_state.nao_position['left']}; top: {st.session_state.nao_position['top']};">Não 😢</button>
-    </div>
+    # Botão Não com JavaScript puro
+    st.markdown("""
+    <button id="nao-button">Não 😢</button>
     
     <script>
-    (function() {{
-        let button = document.getElementById('nao-button');
-        let moving = false;
+    (function() {
+        // Função para criar e iniciar o botão fugitivo
+        function iniciarBotaoFugitivo() {
+            const btn = document.getElementById('nao-button');
+            
+            if (!btn) {
+                // Se o botão ainda não existe, tenta novamente em 100ms
+                setTimeout(iniciarBotaoFugitivo, 100);
+                return;
+            }
+            
+            console.log('Botão Não encontrado!'); // Para debug
+            
+            // Função para mover o botão
+            function moverBotao() {
+                // Dimensões do botão
+                const btnWidth = 140;
+                const btnHeight = 45;
+                
+                // Dimensões da janela
+                const windowWidth = window.innerWidth;
+                const windowHeight = window.innerHeight;
+                
+                // Margem de segurança das bordas
+                const margin = 20;
+                
+                // Calcular posições máximas
+                const maxX = windowWidth - btnWidth - margin;
+                const maxY = windowHeight - btnHeight - margin;
+                const minX = margin;
+                const minY = margin;
+                
+                // Gerar posições aleatórias
+                const novoX = Math.floor(Math.random() * (maxX - minX + 1)) + minX;
+                const novoY = Math.floor(Math.random() * (maxY - minY + 1)) + minY;
+                
+                // Aplicar novas posições
+                btn.style.left = novoX + 'px';
+                btn.style.top = novoY + 'px';
+                btn.style.transform = 'none'; // Remove a transformação inicial
+                
+                console.log('Botão movido para:', novoX, novoY); // Para debug
+            }
+            
+            // Remover a transformação inicial
+            btn.style.transform = 'none';
+            
+            // Evento quando o mouse ENCOSTA no botão
+            btn.addEventListener('mouseenter', function(e) {
+                e.preventDefault();
+                console.log('Mouse enter detectado!');
+                moverBotao();
+            });
+            
+            // Evento de clique (caso consigam clicar)
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Clique detectado!');
+                moverBotao();
+                return false;
+            });
+            
+            // Evento para dispositivos touch
+            btn.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Touch detectado!');
+                moverBotao();
+                return false;
+            });
+            
+            // Prevenir qualquer outro evento
+            btn.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+            
+            btn.addEventListener('mouseup', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+        }
         
-        function moveButton() {{
-            if (moving) return;
-            moving = true;
-            
-            const btnW = 140;
-            const btnH = 45;
-            const margin = 30;
-            
-            const winW = window.innerWidth;
-            const winH = window.innerHeight;
-            
-            let newX = margin + Math.random() * (winW - btnW - 2 * margin);
-            let newY = margin + Math.random() * (winH - btnH - 2 * margin);
-            
-            button.style.left = newX + 'px';
-            button.style.top = newY + 'px';
-            
-            // Salvar posição para quando a página recarregar
-            window.sessionStorage.setItem('nao_left', newX + 'px');
-            window.sessionStorage.setItem('nao_top', newY + 'px');
-            
-            setTimeout(() => {{ moving = false; }}, 200);
-        }}
-        
-        // Restaurar posição anterior se existir
-        const savedLeft = window.sessionStorage.getItem('nao_left');
-        const savedTop = window.sessionStorage.getItem('nao_top');
-        if (savedLeft && savedTop) {{
-            button.style.left = savedLeft;
-            button.style.top = savedTop;
-        }}
-        
-        // Eventos para mover o botão
-        button.addEventListener('mouseenter', moveButton);
-        button.addEventListener('click', function(e) {{
-            e.preventDefault();
-            e.stopPropagation();
-            moveButton();
-        }});
-        
-        button.addEventListener('touchstart', function(e) {{
-            e.preventDefault();
-            e.stopPropagation();
-            moveButton();
-        }});
-        
-        // Prevenir clique no botão "Não" de qualquer forma
-        button.addEventListener('mousedown', function(e) {{
-            e.preventDefault();
-            e.stopPropagation();
-        }});
-    }})();
+        // Iniciar quando a página carregar
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', iniciarBotaoFugitivo);
+        } else {
+            iniciarBotaoFugitivo();
+        }
+    })();
     </script>
     """, unsafe_allow_html=True)
 
