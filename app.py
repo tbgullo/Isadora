@@ -3,7 +3,7 @@ import streamlit.components.v1 as components
 import base64
 
 # Configuração da página
-st.set_page_config(layout="wide", page_title="Convite Especial 💖")
+st.set_page_config(layout="wide", page_title="Convite Especial")
 
 def get_base64_image(path):
     try:
