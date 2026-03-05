@@ -30,7 +30,6 @@ if "page" not in st.session_state:
 # -----------------------------
 st.markdown(f"""
 <style>
-    /* Trava total contra rolagem */
     html, body, [data-testid="stAppViewContainer"], .main, .block-container {{
         overflow: hidden !important;
         height: 100vh !important;
@@ -58,7 +57,6 @@ st.markdown(f"""
         font-family: 'Segoe UI', Arial, sans-serif;
     }}
 
-    /* Botão Sim (Streamlit) */
     .stButton > button {{
         background: linear-gradient(90deg, #ff4d6d, #ff758c) !important;
         color: white !important;
@@ -72,7 +70,6 @@ st.markdown(f"""
         z-index: 10;
     }}
 
-    /* Botão Não (Injetado) */
     #nao-button {{
         position: fixed;
         background-color: #ffb6c1;
@@ -87,11 +84,11 @@ st.markdown(f"""
         font-weight: bold;
         box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         z-index: 999999;
-        /* Alinhamento inicial */
         left: calc(50% + 15px);
         top: 72%;
         transform: translateY(-50%);
         transition: all 0.15s ease-out;
+        display: block !important;
     }}
 
     .moving-img {{
@@ -130,53 +127,57 @@ if st.session_state.page == "home":
 
     col1, col2, col3 = st.columns([1, 1, 1])
     with col2:
-        # Desloca o Sim para a esquerda para abrir espaço para o Não ao lado
         st.markdown('<div style="transform: translateX(-80px);">', unsafe_allow_html=True)
         if st.button("Sim 💘"):
             st.session_state.page = "sim"
             st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # Injeção do Botão "Não" e Script Robusto
+    # Injeção do Botão "Não" com Script Auto-Executável
     st.markdown("""
         <button id="nao-button">Não 😢</button>
         
         <script>
-            const btn = document.getElementById("nao-button");
+            (function() {
+                const initFoge = () => {
+                    const btn = document.getElementById("nao-button");
+                    if (!btn) {
+                        // Se o botão ainda não existir, tenta novamente em 100ms
+                        setTimeout(initFoge, 100);
+                        return;
+                    }
 
-            const foge = () => {
-                // Pega a largura e altura real da janela do navegador no momento
-                const winW = window.innerWidth;
-                const winH = window.innerHeight;
-                
-                const btnW = 140;
-                const btnH = 45;
-                
-                // Calcula posições máximas seguras
-                const maxLeft = winW - btnW - 20;
-                const maxTop = winH - btnH - 20;
-                
-                let newX = Math.floor(Math.random() * maxLeft);
-                let newY = Math.floor(Math.random() * maxTop);
-                
-                // Garante que o botão não saia da tela (mínimo de 10px da borda)
-                newX = Math.max(10, newX);
-                newY = Math.max(10, newY);
-                
-                // Se cair na área central (onde estão os botões e imagem), empurra pra borda
-                if (newX > winW * 0.3 && newX < winW * 0.7 && newY > winH * 0.3 && newY < winH * 0.7) {
-                    newX = 20;
-                    newY = 20;
-                }
+                    const foge = (e) => {
+                        e.preventDefault();
+                        const winW = window.innerWidth;
+                        const winH = window.innerHeight;
+                        const btnW = 140;
+                        const btnH = 45;
+                        
+                        // Garante que o botão fique dentro da área visível
+                        let newX = Math.random() * (winW - btnW - 40) + 20;
+                        let newY = Math.random() * (winH - btnH - 40) + 20;
+                        
+                        // Evita a área central
+                        if (newX > winW * 0.3 && newX < winW * 0.7 && newY > winH * 0.3 && newY < winH * 0.7) {
+                            newX = 20;
+                            newY = 20;
+                        }
 
-                btn.style.left = newX + "px";
-                btn.style.top = newY + "px";
-            };
+                        btn.style.left = newX + "px";
+                        btn.style.top = newY + "px";
+                    };
 
-            // Adiciona o evento de passar o mouse
-            btn.addEventListener("mouseover", foge);
-            // Adiciona evento de clique (caso alguém seja muito rápido)
-            btn.addEventListener("click", foge);
+                    btn.addEventListener("mouseover", foge);
+                    btn.addEventListener("touchstart", foge); // Suporte para celular
+                    btn.addEventListener("click", (e) => {
+                        e.preventDefault();
+                        foge(e);
+                    });
+                };
+                
+                initFoge();
+            })();
         </script>
     """, unsafe_allow_html=True)
 
@@ -201,7 +202,6 @@ elif st.session_state.page == "sim":
             st.session_state.page = "home"
             st.rerun()
 
-    # Imagens Orbitais
     st.markdown(f"""
         <img src="data:image/jpg;base64,{img1}" class="moving-img" style="animation-delay: 0s;">
         <img src="data:image/jpg;base64,{img2}" class="moving-img" style="animation-delay: -7.5s;">
