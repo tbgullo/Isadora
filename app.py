@@ -176,9 +176,9 @@ if st.session_state.page == "home":
                     const distX = Math.abs(e.clientX - centerX);
                     const distY = Math.abs(e.clientY - centerY);
 
-                    if (distX < 80 && distY < 50) {
-                        mover();
-                    }
+                    
+                    mover();
+                    
                 });
 
                 btn.addEventListener("touchstart", function(e) {
