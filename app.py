@@ -68,7 +68,7 @@ st.markdown(f"""
 
     /* Estilo do Botão Não (HTML Puro) */
     #btn-nao {{
-        
+        position: relative;
         background: #ffb6c1;
         color: white;
         padding: 10px 30px;
