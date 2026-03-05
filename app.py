@@ -150,7 +150,7 @@ if st.session_state.page == "home":
             btn.addEventListener("mouseover", () => {{
                 const margin = 10;
                 const maxX = window.innerWidth - btn.offsetWidth - margin;
-                const maxY = window.innerHeight - btn.offsetHeight - margin;
+                const maxY = window.innerHeight - btn.offsetHeight - margin - 50;
                 btn.style.left = Math.max(margin, Math.random() * maxX) + "px";
                 btn.style.top = Math.max(margin, Math.random() * maxY) + "px";
                 btn.style.transform = "none";
@@ -177,7 +177,7 @@ elif st.session_state.page == "sim":
     """, unsafe_allow_html=True)
 
     # Botão Voltar (também seguindo o estilo mas sem o margin-top gigante)
-    st.markdown("<div style='margin-top: 30px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='margin-top: 10px;'></div>", unsafe_allow_html=True)
     col1, col2, col3, col4, col5 = st.columns(5)
     with col3:
         if st.button("Voltar"):
