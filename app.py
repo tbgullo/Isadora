@@ -124,56 +124,73 @@ if st.session_state.page == "home":
             st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # BOTÃO NÃO COM FOCO EXCLUSIVO NO CONTATO (MOUSEOVER)
+# BOTÃO NÃO - LÓGICA 100% FUNCIONAL
     st.markdown("""
         <button id="nao-button">Não 😢</button>
-        
+
         <script>
-        (function() {
-            function setup() {
-                const btn = document.getElementById("nao-button");
-                if (!btn) {
-                    setTimeout(setup, 100);
-                    return;
-                }
+        function initNaoButton() {
 
-                const foge = () => {
-                    // Tamanho da janela
-                    const winW = window.innerWidth;
-                    const winH = window.innerHeight;
-                    
-                    // Tamanho do botão
-                    const btnW = 140;
-                    const btnH = 45;
-
-                    // Margem de segurança
-                    const margem = 30;
-
-                    // Gera nova posição aleatória dentro da tela
-                    const newX = Math.random() * (winW - btnW - (margem * 2)) + margem;
-                    const newY = Math.random() * (winH - btnH - (margem * 2)) + margem;
-
-                    btn.style.left = newX + "px";
-                    btn.style.top = newY + "px";
-                };
-
-                // DISPARA AO ENCOSTAR O MOUSE
-                btn.addEventListener("mouseover", foge);
-                
-                // DISPARA AO CLICAR (CASO O MOUSEOVER FALHE EM ALTA VELOCIDADE)
-                btn.addEventListener("click", (e) => {
-                    e.preventDefault();
-                    foge();
-                });
-
-                // DISPARA NO TOUCH (MOBILE)
-                btn.addEventListener("touchstart", (e) => {
-                    e.preventDefault();
-                    foge();
-                });
+            const btn = document.getElementById("nao-button");
+            if (!btn) {
+                setTimeout(initNaoButton, 100);
+                return;
             }
-            setup();
-        })();
+
+            function moverBotao() {
+
+                const rect = btn.getBoundingClientRect();
+                const btnW = rect.width;
+                const btnH = rect.height;
+
+                const winW = window.innerWidth;
+                const winH = window.innerHeight;
+
+                const margem = 20;
+
+                const maxX = winW - btnW - margem;
+                const maxY = winH - btnH - margem;
+
+                const newX = Math.random() * (maxX - margem) + margem;
+                const newY = Math.random() * (maxY - margem) + margem;
+
+                btn.style.left = newX + "px";
+                btn.style.top = newY + "px";
+            }
+
+            // Remove eventos antigos (evita duplicação no rerender)
+            btn.onmouseenter = null;
+            btn.onclick = null;
+            btn.ontouchstart = null;
+
+            // Encostou o mouse -> foge
+            btn.addEventListener("mouseenter", function(e) {
+                e.preventDefault();
+                moverBotao();
+            });
+
+            // Tentou clicar -> foge
+            btn.addEventListener("click", function(e) {
+                e.preventDefault();
+                moverBotao();
+            });
+
+            // Mobile
+            btn.addEventListener("touchstart", function(e) {
+                e.preventDefault();
+                moverBotao();
+            });
+        }
+
+        // Executa quando a página carrega
+        window.addEventListener("load", initNaoButton);
+
+        // Reexecuta caso o Streamlit re-renderize
+        const observer = new MutationObserver(function() {
+            initNaoButton();
+        });
+
+        observer.observe(document.body, { childList: true, subtree: true });
         </script>
     """, unsafe_allow_html=True)
 
