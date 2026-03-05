@@ -27,22 +27,28 @@ if "page" not in st.session_state:
     st.session_state.page = "home"
 
 # -----------------------------
-# CSS ESTILIZADO E ROMÂNTICO
+# CSS ESTILIZADO E TRAVA DE ROLAGEM
 # -----------------------------
 st.markdown(f"""
 <style>
+    /* Trava total contra rolagem */
+    html, body, [data-testid="stAppViewContainer"], .main {{
+        overflow: hidden !important;
+        height: 100vh !important;
+        width: 100vw !important;
+        position: fixed;
+    }}
+
     [data-testid="stAppViewContainer"] {{
         background: linear-gradient(135deg, #fff5f7 0%, #ffe4e1 100%);
-        overflow: hidden !important;
     }}
     
     .main .block-container {{
         height: 100vh;
-        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         justify-content: center;
-        padding: 0;
+        padding: 0 !important;
     }}
 
     #MainMenu, footer, header {{visibility: hidden;}}
@@ -52,7 +58,7 @@ st.markdown(f"""
         font-family: 'Segoe UI', Arial, sans-serif;
     }}
 
-    /* Estilo dos Botões Streamlit (Sim e Voltar) */
+    /* Botões Sim e Voltar */
     .stButton > button {{
         background: linear-gradient(90deg, #ff4d6d, #ff758c) !important;
         color: white !important;
@@ -62,39 +68,33 @@ st.markdown(f"""
         font-weight: bold !important;
         border: none !important;
         box-shadow: 0 4px 10px rgba(255, 77, 109, 0.3) !important;
-        transition: 0.3s !important;
         width: 140px;
         margin: 0 auto;
-    }}
-    
-    .stButton > button:hover {{
-        transform: scale(1.05);
-        box-shadow: 0 6px 15px rgba(255, 77, 109, 0.5) !important;
     }}
 
     /* Animação das fotos orbitando */
     @keyframes moveClockwise {{
-        0%   {{ top: 20px; left: 20px; }}
-        25%  {{ top: 20px; left: calc(100vw - 110px); }}
-        50%  {{ top: calc(100vh - 110px); left: calc(100vw - 110px); }}
-        75%  {{ top: calc(100vh - 110px); left: 20px; }}
-        100% {{ top: 20px; left: 20px; }}
+        0%   {{ top: 15px; left: 15px; }}
+        25%  {{ top: 15px; left: calc(100vw - 100px); }}
+        50%  {{ top: calc(100vh - 100px); left: calc(100vw - 100px); }}
+        75%  {{ top: calc(100vh - 100px); left: 15px; }}
+        100% {{ top: 15px; left: 15px; }}
     }}
 
     .moving-img {{
         position: fixed;
-        width: 85px;
+        width: 80px;
         z-index: 999;
         border-radius: 50%;
         border: 3px solid white;
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        animation: moveClockwise 25s linear infinite;
+        animation: moveClockwise 30s linear infinite;
     }}
 
     .img-1 {{ animation-delay: 0s; }}
-    .img-2 {{ animation-delay: -6.25s; }}
-    .img-3 {{ animation-delay: -12.5s; }}
-    .img-4 {{ animation-delay: -18.75s; }}
+    .img-2 {{ animation-delay: -7.5s; }}
+    .img-3 {{ animation-delay: -15s; }}
+    .img-4 {{ animation-delay: -22.5s; }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -104,15 +104,14 @@ st.markdown(f"""
 if st.session_state.page == "home":
     
     st.markdown(f"""
-        <div style="text-align: center; margin-bottom: 20px;">
+        <div style="text-align: center; margin-bottom: 10px;">
             <div style="display: inline-block; padding: 10px; background: white; border-radius: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
-                <img src="data:image/jpg;base64,{img_home}" width="250" style="border-radius: 20px;">
+                <img src="data:image/jpg;base64,{img_home}" width="220" style="border-radius: 20px;">
             </div>
-            <h2 style="margin-top: 20px;">Aceitas sair comigo na Sexta? 💖</h2>
+            <h2 style="margin-top: 15px;">Aceitas sair comigo na Sexta? 💖</h2>
         </div>
     """, unsafe_allow_html=True)
 
-    # Criando colunas para os botões Sim e Não ficarem lado a lado
     col_vazia1, col_sim, col_nao, col_vazia2 = st.columns([2, 1, 1, 2])
     
     with col_sim:
@@ -121,10 +120,10 @@ if st.session_state.page == "home":
             st.rerun()
 
     with col_nao:
-        # Componente HTML apenas para o botão "Não" para ele poder fugir
+        # Script inteligente para fuga do botão "Não"
         html_nao = f"""
         <html>
-        <body style="background:transparent; margin:0; overflow:hidden;">
+        <body style="background:transparent; margin:0; overflow:hidden; width: 100vw; height: 100vh;">
             <button id="nao" style="
                 background-color: #ffb6c1;
                 color: white;
@@ -136,27 +135,51 @@ if st.session_state.page == "home":
                 cursor: pointer;
                 font-family: Arial;
                 font-weight: bold;
-                transition: 0.1s;
                 box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+                position: absolute;
+                left: 0; top: 0;
             ">Não 😢</button>
 
             <script>
                 const btn = document.getElementById("nao");
+                
                 btn.addEventListener("mouseover", () => {{
-                    // Define limites de fuga baseados na viewport para não sumir
-                    const margin = 50;
-                    const maxX = window.innerWidth - 150;
-                    const maxY = window.innerHeight - 100;
+                    // Pega o tamanho da janela
+                    const winW = window.innerWidth;
+                    const winH = window.innerHeight;
                     
+                    // Define áreas seguras (longe do centro onde está a imagem e o botão Sim)
+                    // O botão vai fugir para as extremidades da tela
+                    let newX, newY;
+                    
+                    // Lógica: Se estiver no meio, foge para os cantos aleatoriamente
+                    const side = Math.floor(Math.random() * 4);
+                    
+                    if(side === 0) {{ // Canto superior
+                        newX = Math.random() * (winW - 150);
+                        newY = Math.random() * (winH * 0.2);
+                    }} else if(side === 1) {{ // Canto inferior
+                        newX = Math.random() * (winW - 150);
+                        newY = winH - 60 - (Math.random() * (winH * 0.2));
+                    }} else if(side === 2) {{ // Lateral esquerda
+                        newX = Math.random() * (winW * 0.2);
+                        newY = Math.random() * (winH - 60);
+                    }} else {{ // Lateral direita
+                        newX = winW - 150 - (Math.random() * (winW * 0.2));
+                        newY = Math.random() * (winH - 60);
+                    }}
+
                     btn.style.position = "fixed";
-                    btn.style.left = Math.max(margin, Math.random() * maxX) + "px";
-                    btn.style.top = Math.max(margin, Math.random() * maxY) + "px";
+                    btn.style.left = newX + "px";
+                    btn.style.top = newY + "px";
                 }});
             </script>
         </body>
         </html>
         """
-        components.html(html_nao, height=50)
+        # O iframe do botão Não agora ocupa a tela toda para ele poder fugir para qualquer lugar
+        # mas sem interferir no clique do botão Sim
+        st.components.v1.html(html_nao, height=60)
 
 # -----------------------------
 # TELA DO SIM
@@ -166,14 +189,13 @@ elif st.session_state.page == "sim":
     st.markdown(f"""
         <div style="text-align: center;">
             <div style="display: inline-block; padding: 10px; background: white; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-                <img src="data:image/jpg;base64,{img_sim}" width="350" style="border-radius: 20px;">
+                <img src="data:image/jpg;base64,{img_sim}" width="320" style="border-radius: 20px;">
             </div>
-            <h1 style="margin-top: 25px;">Vai ser uma noite memorável</h1>
-            <h3 style="color: #666; margin-bottom: 5px;">Pra você nunca se esquecer de mim</h3>
+            <h1 style="margin-top: 20px;">Vai ser uma noite memorável! ✨</h1>
+            <h3 style="color: #666; margin-bottom: 10px;">Para você nunca se esquecer de mim ❤️</h3>
         </div>
     """, unsafe_allow_html=True)
 
-    # Botão Voltar logo abaixo
     col1, col2, col3, col4, col5 = st.columns(5)
     with col3:
         if st.button("Voltar"):
