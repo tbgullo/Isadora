@@ -150,7 +150,7 @@ if st.session_state.page == "home":
             btn.addEventListener("mouseover", () => {{
                 const margin = 10;
                 const maxX = window.innerWidth - btn.offsetWidth - margin;
-                const maxY = window.innerHeight - btn.offsetHeight - margin - 50;
+                const maxY = window.innerHeight - btn.offsetHeight - margin - 500;
                 btn.style.left = Math.max(margin, Math.random() * maxX) + "px";
                 btn.style.top = Math.max(margin, Math.random() * maxY) + "px";
                 btn.style.transform = "none";
