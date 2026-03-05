@@ -157,15 +157,15 @@ if st.session_state.page == "home":
                     
                     if(side === 0) {{ // Canto superior
                         newX = Math.random() * (winW - 150);
-                        newY = Math.random() * (winH * 0.2);
+                        newY = Math.random() * (winH * 1.2);
                     }} else if(side === 1) {{ // Canto inferior
                         newX = Math.random() * (winW - 150);
-                        newY = winH - 60 - (Math.random() * (winH * 0.2));
+                        newY = winH - 60 - (Math.random() * (winH * 1.2));
                     }} else if(side === 2) {{ // Lateral esquerda
-                        newX = Math.random() * (winW * 0.2);
+                        newX = Math.random() * (winW * 1.2);
                         newY = Math.random() * (winH - 60);
                     }} else {{ // Lateral direita
-                        newX = winW - 150 - (Math.random() * (winW * 0.2));
+                        newX = winW - 150 - (Math.random() * (winW * 1.2));
                         newY = Math.random() * (winH - 60);
                     }}
 
