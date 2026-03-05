@@ -11,7 +11,7 @@ def get_base64_image(path):
     except:
         return ""
 
-# Carregando imagens (Certifique-se que os arquivos estão na pasta)
+# Carregando imagens
 img_home = get_base64_image("Image.jpg")
 img_sim = get_base64_image("ImageSim.jpg")
 img1 = get_base64_image("Image1.jpg")
@@ -23,7 +23,7 @@ if "page" not in st.session_state:
     st.session_state.page = "home"
 
 # -----------------------------
-# CSS 
+# CSS E JAVASCRIPT
 # -----------------------------
 st.markdown(f"""
 <style>
@@ -33,7 +33,6 @@ st.markdown(f"""
         width: 100vw !important;
         margin: 0 !important;
         padding: 0 !important;
-        position: fixed !important;
     }}
 
     [data-testid="stAppViewContainer"] {{
@@ -54,6 +53,7 @@ st.markdown(f"""
         font-family: 'Segoe UI', Arial, sans-serif;
     }}
 
+    /* Botão Sim (Streamlit) */
     .stButton > button {{
         background: linear-gradient(90deg, #ff4d6d, #ff758c) !important;
         color: white !important;
@@ -64,15 +64,14 @@ st.markdown(f"""
         border: none !important;
         box-shadow: 0 4px 10px rgba(255, 77, 109, 0.3) !important;
         width: 140px;
-        z-index: 10;
     }}
 
-    /* Estilo do Botão Não - Importante: Transition suave */
-    #nao-button {{
+    /* Estilo do Botão Não (HTML Puro) */
+    #btn-nao {{
         position: fixed;
-        background-color: #ffb6c1;
+        background: #ffb6c1;
         color: white;
-        padding: 10px 0;
+        padding: 10px 30px;
         width: 140px;
         font-size: 18px;
         border-radius: 50px;
@@ -81,11 +80,10 @@ st.markdown(f"""
         font-family: Arial;
         font-weight: bold;
         box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        z-index: 999999;
-        left: calc(50% + 15px);
-        top: 72%;
-        transform: translateY(-50%);
-        transition: left 0.1s ease, top 0.1s ease;
+        z-index: 9999;
+        transition: all 0.2s ease;
+        left: 55%;
+        top: 70%;
     }}
 
     .moving-img {{
@@ -105,6 +103,18 @@ st.markdown(f"""
         100% {{ top: 15px; left: 15px; }}
     }}
 </style>
+
+<script>
+    function moveButton() {{
+        const btn = document.getElementById('btn-nao');
+        // Calcula posições aleatórias dentro da tela (descontando o tamanho do botão)
+        const x = Math.random() * (window.innerWidth - btn.offsetWidth);
+        const y = Math.random() * (window.innerHeight - btn.offsetHeight);
+        
+        btn.style.left = x + 'px';
+        btn.style.top = y + 'px';
+    }}
+</script>
 """, unsafe_allow_html=True)
 
 # -----------------------------
@@ -123,13 +133,20 @@ if st.session_state.page == "home":
 
     col1, col2, col3 = st.columns([1, 1, 1])
     with col2:
-        st.markdown('<div style="transform: translateX(-80px);">', unsafe_allow_html=True)
+        # O Sim permanece como botão do Streamlit para mudar o state do Python
         if st.button("Sim 💘"):
             st.session_state.page = "sim"
             st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
 
-
+    # O botão "Não" é injetado via HTML puro para suportar o JS de movimento
+    st.markdown("""
+        <button id="btn-nao" 
+                onmouseover="moveButton()" 
+                onclick="moveButton()" 
+                ontouchstart="moveButton()">
+            Não 😢
+        </button>
+    """, unsafe_allow_html=True)
 
 # -----------------------------
 # TELA DO SIM
