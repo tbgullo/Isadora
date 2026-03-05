@@ -27,68 +27,78 @@ if "page" not in st.session_state:
     st.session_state.page = "home"
 
 # -----------------------------
-# CSS GLOBAL ROMÂNTICO
+# CSS ESTILIZADO E ROMÂNTICO
 # -----------------------------
-st.markdown("""
+st.markdown(f"""
 <style>
-#MainMenu {visibility: hidden;}
-footer {visibility: hidden;}
-header {visibility: hidden;}
+    /* 1. Trava total do Viewport e Fundo Gradiente Romântico */
+    [data-testid="stAppViewContainer"] {{
+        background: linear-gradient(135deg, #fff5f7 0%, #ffe4e1 100%);
+        overflow: hidden !important;
+    }}
+    
+    .main .block-container {{
+        height: 100vh;
+        max-height: 100vh;
+        overflow: hidden !important;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding-top: 0rem;
+    }}
 
-body {
-    background: linear-gradient(135deg, #ffe6f0, #ffc2d1, #ff8fab);
-    overflow: hidden;
-}
+    #MainMenu, footer, header {{visibility: hidden;}}
 
-.main .block-container {
-    padding-top: 2rem;
-    padding-bottom: 0rem;
-    height: 100vh;
-    overflow: hidden;
-}
+    /* 2. Estilização dos Títulos */
+    h1, h2, h3 {{
+        color: #d63384 !important;
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+    }}
 
-/* Botões */
-.stButton > button {
-    background: linear-gradient(45deg, #ff4d6d, #ff8fab) !important;
-    color: white !important;
-    border-radius: 30px !important;
-    padding: 14px 35px !important;
-    font-size: 20px !important;
-    border: none !important;
-    display: block;
-    margin: 0 auto;
-    box-shadow: 0px 6px 15px rgba(255, 77, 109, 0.4);
-    transition: 0.3s;
-}
+    /* 3. Botão SIM (Nativo do Streamlit) */
+    /* Ajustando posição Y (margin-top maior) e Estética */
+    .stButton > button {{
+        background: linear-gradient(90deg, #ff4d6d, #ff758c) !important;
+        color: white !important;
+        border-radius: 50px !important;
+        padding: 15px 45px !important;
+        font-size: 22px !important;
+        font-weight: bold !important;
+        border: none !important;
+        box-shadow: 0 8px 15px rgba(255, 77, 109, 0.4) !important;
+        margin-top: 100px !important; /* ALTERAÇÃO DA POSIÇÃO Y */
+        transition: all 0.3s ease !important;
+    }}
+    
+    .stButton > button:hover {{
+        transform: translateY(-3px);
+        box-shadow: 0 12px 20px rgba(255, 77, 109, 0.6) !important;
+    }}
 
-.stButton > button:hover {
-    transform: scale(1.08);
-    box-shadow: 0px 8px 20px rgba(255, 77, 109, 0.6);
-}
+    /* 4. Animação das fotos orbitando */
+    @keyframes moveClockwise {{
+        0%   {{ top: 20px; left: 20px; }}
+        25%  {{ top: 20px; left: calc(100vw - 120px); }}
+        50%  {{ top: calc(100vh - 120px); left: calc(100vw - 120px); }}
+        75%  {{ top: calc(100vh - 120px); left: 20px; }}
+        100% {{ top: 20px; left: 20px; }}
+    }}
 
-/* Animação fotos */
-@keyframes moveClockwise {
-    0%   { top: 10px; left: 10px; }
-    25%  { top: 10px; left: calc(100vw - 110px); }
-    50%  { top: calc(100vh - 110px); left: calc(100vw - 110px); }
-    75%  { top: calc(100vh - 110px); left: 10px; }
-    100% { top: 10px; left: 10px; }
-}
+    .moving-img {{
+        position: fixed;
+        width: 90px;
+        z-index: 999;
+        border-radius: 50%;
+        border: 4px solid white;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        animation: moveClockwise 30s linear infinite;
+    }}
 
-.moving-img {
-    position: fixed;
-    width: 100px;
-    z-index: 999;
-    border-radius: 18px;
-    border: 3px solid white;
-    box-shadow: 0px 5px 20px rgba(0,0,0,0.2);
-    animation: moveClockwise 25s linear infinite;
-}
-
-.img-1 { animation-delay: 0s; }
-.img-2 { animation-delay: -6.25s; }
-.img-3 { animation-delay: -12.5s; }
-.img-4 { animation-delay: -18.75s; }
+    .img-1 {{ animation-delay: 0s; }}
+    .img-2 {{ animation-delay: -7.5s; }}
+    .img-3 {{ animation-delay: -15s; }}
+    .img-4 {{ animation-delay: -22.5s; }}
 
 </style>
 """, unsafe_allow_html=True)
@@ -97,107 +107,84 @@ body {
 # TELA INICIAL
 # -----------------------------
 if st.session_state.page == "home":
-
+    
+    # Conteúdo central
     st.markdown(f"""
-        <div style="text-align: center; height: 60vh; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-            <img src="data:image/jpg;base64,{img_home}" width="260"
-                 style="border-radius: 25px; box-shadow: 0px 8px 25px rgba(0,0,0,0.2);">
-            <h2 style="color: white; font-family: 'Trebuchet MS';
-                       margin-top: 25px; font-size: 34px;
-                       text-shadow: 2px 2px 8px rgba(0,0,0,0.3);">
-                Aceitas sair comigo na Sexta? 💖
-            </h2>
+        <div style="text-align: center;">
+            <div style="display: inline-block; padding: 10px; background: white; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                <img src="data:image/jpg;base64,{img_home}" width="280" style="border-radius: 20px;">
+            </div>
+            <h1 style="margin-top: 25px; font-size: 2.5rem;">Aceitas sair comigo na Sexta? 💖</h1>
         </div>
     """, unsafe_allow_html=True)
 
-    # Botão Sim mais abaixo
-    st.write("")
-    st.write("")
-    st.write("")
-
+    # Botão Sim
     col1, col2, col3, col4, col5 = st.columns(5)
     with col3:
         if st.button("Sim 💘"):
             st.session_state.page = "sim"
             st.rerun()
 
-    # Botão "Não" fugindo
-    html_nao = """
+    # Botão "Não" que foge
+    html_nao = f"""
     <html>
-    <head>
-    <style>
-        .btn-nao {
-            background: linear-gradient(45deg, #ff4d6d, #ff8fab);
+    <body style="background:transparent;">
+        <button id="nao" style="
+            background-color: #ff8fa3;
             color: white;
-            padding: 12px 28px;
-            font-size: 18px;
-            border-radius: 30px;
-            border: none;
+            padding: 10px 25px;
+            font-size: 16px;
+            border-radius: 50px;
+            border: 2px solid white;
             cursor: pointer;
             position: fixed;
             z-index: 1000;
             font-family: Arial;
-            box-shadow: 0px 6px 15px rgba(255, 77, 109, 0.4);
-        }
-    </style>
-    </head>
-    <body>
-        <button id="nao" class="btn-nao"
-            style="top: 75%; left: 50%; transform: translateX(-50%);">
-            Não 😢
-        </button>
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            top: 75%; left: 50%; transform: translateX(-50%);
+        ">Não 😢</button>
 
         <script>
-            const btnNao = document.getElementById("nao");
-
-            btnNao.addEventListener("mouseover", () => {
-                const margin = 40;
-                const maxX = window.innerWidth - btnNao.offsetWidth - margin;
-                const maxY = window.innerHeight - btnNao.offsetHeight - margin;
-
-                const newX = Math.max(margin, Math.random() * maxX);
-                const newY = Math.max(margin, Math.random() * maxY);
-
-                btnNao.style.left = newX + "px";
-                btnNao.style.top = newY + "px";
-                btnNao.style.transform = "none";
-            });
+            const btn = document.getElementById("nao");
+            btn.addEventListener("mouseover", () => {{
+                const margin = 50;
+                const maxX = window.innerWidth - btn.offsetWidth - margin;
+                const maxY = window.innerHeight - btn.offsetHeight - margin;
+                btn.style.left = Math.max(margin, Math.random() * maxX) + "px";
+                btn.style.top = Math.max(margin, Math.random() * maxY) + "px";
+                btn.style.transform = "none";
+            }});
         </script>
     </body>
     </html>
     """
-
     components.html(html_nao, height=200)
 
 # -----------------------------
 # TELA DO SIM
 # -----------------------------
 elif st.session_state.page == "sim":
-
+    
     st.markdown(f"""
-        <div style="text-align: center; padding-top: 8vh;">
-            <img src="data:image/jpg;base64,{img_sim}" width="350"
-                 style="border-radius: 25px; box-shadow: 0px 8px 25px rgba(0,0,0,0.2);">
-            <h1 style="color: white; font-family: 'Trebuchet MS';
-                       text-shadow: 2px 2px 10px rgba(0,0,0,0.4);">
-                Vai ser uma noite cheia de surpresas! ✨
-            </h1>
-            <h3 style="color: white;">
-                Para você não se esquecer da gente 💕
-            </h3>
+        <div style="text-align: center;">
+            <div style="display: inline-block; padding: 10px; background: white; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                <img src="data:image/jpg;base64,{img_sim}" width="380" style="border-radius: 20px;">
+            </div>
+            <h1 style="margin-top: 30px;">Combinado! ✨</h1>
+            <h3 style="color: #666;">Prepare-se para uma noite inesquecível ❤️</h3>
         </div>
     """, unsafe_allow_html=True)
 
-    st.write("")
-    st.write("")
-
+    # Botão Voltar (também seguindo o estilo mas sem o margin-top gigante)
+    st.markdown("<div style='margin-top: 40px;'></div>", unsafe_allow_html=True)
     col1, col2, col3, col4, col5 = st.columns(5)
     with col3:
-        if st.button("Voltar 💌"):
+        if st.button("Voltar"):
             st.session_state.page = "home"
             st.rerun()
 
-    # Fotos animadas
+    # Imagens Orbitais (Sentido horário, presas à tela)
     st.markdown(f"""
         <img src="data:image/jpg;base64,{img1}" class="moving-img img-1">
         <img src="data:image/jpg;base64,{img2}" class="moving-img img-2">
