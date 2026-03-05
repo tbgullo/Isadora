@@ -27,7 +27,7 @@ if "page" not in st.session_state:
     st.session_state.page = "home"
 
 # -----------------------------
-# CSS ESTILIZADO E TRAVA DE ROLAGEM REAL
+# CSS ESTILIZADO E TRAVA DE ROLAGEM
 # -----------------------------
 st.markdown(f"""
 <style>
@@ -45,7 +45,6 @@ st.markdown(f"""
         background: linear-gradient(135deg, #fff5f7 0%, #ffe4e1 100%);
     }}
     
-    /* Centralização do conteúdo */
     .main .block-container {{
         display: flex;
         flex-direction: column;
@@ -59,7 +58,6 @@ st.markdown(f"""
         color: #d63384 !important;
         font-family: 'Segoe UI', Arial, sans-serif;
         text-align: center;
-        margin-bottom: 10px;
     }}
 
     /* Botões Sim e Voltar */
@@ -74,6 +72,7 @@ st.markdown(f"""
         box-shadow: 0 4px 10px rgba(255, 77, 109, 0.3) !important;
         width: 140px;
         transition: 0.3s;
+        transform: translateX(-80px); /* Ajuste para centralizar o conjunto visualmente no início */
     }}
 
     /* Animação das fotos orbitando */
@@ -116,13 +115,12 @@ if st.session_state.page == "home":
         </div>
     """, unsafe_allow_html=True)
 
-    col1, col2, col3 = st.columns([1, 1, 1])
-    with col2:
-        if st.button("Sim 💘"):
-            st.session_state.page = "sim"
-            st.rerun()
+    # Botão Sim centralizado (com offset no CSS para abrir espaço para o Não)
+    if st.button("Sim 💘"):
+        st.session_state.page = "sim"
+        st.rerun()
 
-    # Botão "Não" GLOBAL sem gerar scroll
+    # Botão "Não" GLOBAL que nasce ao lado do Sim
     html_nao_global = f"""
     <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999;">
         <button id="nao" style="
@@ -139,31 +137,33 @@ if st.session_state.page == "home":
             font-weight: bold;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             position: absolute;
-            left: calc(50% + 80px); /* Posicionado à direita do botão Sim */
-            top: 72%;
-            transition: 0.1s ease;
+            /* ALINHAMENTO INICIAL: Lado a lado com o Sim */
+            left: calc(50% + 10px); 
+            top: 68.5%; 
+            transition: top 0.1s, left 0.1s;
         ">Não 😢</button>
     </div>
 
     <script>
         const btn = document.getElementById("nao");
+        let moved = false;
         
         btn.addEventListener("mouseover", () => {{
             const winW = window.innerWidth;
             const winH = window.innerHeight;
-            
-            // Define o tamanho do botão para garantir que ele fique na tela
             const btnW = 140;
             const btnH = 45;
 
-            // Gera novas coordenadas garantindo que o botão não saia da borda
-            let newX = Math.random() * (winW - btnW - 20);
-            let newY = Math.random() * (winH - btnH - 20);
+            let newX, newY;
+            
+            // Primeira fuga e subsequentes
+            newX = Math.random() * (winW - btnW - 40) + 20;
+            newY = Math.random() * (winH - btnH - 40) + 20;
 
-            // Evita a zona central (onde estão imagem e botão Sim)
-            if (newX > winW * 0.25 && newX < winW * 0.75 && newY > winH * 0.25 && newY < winH * 0.75) {{
-                newX = newX < winW * 0.5 ? 20 : winW - btnW - 20;
-                newY = newY < winH * 0.5 ? 20 : winH - btnH - 20;
+            // Restrição: Não deixar o botão parar em cima da imagem/botão sim (área central)
+            if (newX > winW * 0.3 && newX < winW * 0.7 && newY > winH * 0.3 && newY < winH * 0.7) {{
+                newX = newX < winW * 0.5 ? 40 : winW - btnW - 40;
+                newY = newY < winH * 0.5 ? 40 : winH - btnH - 40;
             }}
 
             btn.style.left = newX + "px";
@@ -171,7 +171,6 @@ if st.session_state.page == "home":
         }});
     </script>
     """
-    # Altura definida como 0 para não criar barra de rolagem
     components.html(html_nao_global, height=0)
 
 # -----------------------------
@@ -189,11 +188,9 @@ elif st.session_state.page == "sim":
         </div>
     """, unsafe_allow_html=True)
 
-    col1, col2, col3 = st.columns([1, 1, 1])
-    with col2:
-        if st.button("Voltar"):
-            st.session_state.page = "home"
-            st.rerun()
+    if st.button("Voltar"):
+        st.session_state.page = "home"
+        st.rerun()
 
     # Imagens Orbitais
     st.markdown(f"""
