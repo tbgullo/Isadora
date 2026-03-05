@@ -2,7 +2,7 @@ import streamlit as st
 import base64
 import streamlit.components.v1 as components
 
-# Configuração da página
+# Configuração da página para evitar margens laterais
 st.set_page_config(layout="wide", page_title="Convite Especial")
 
 # -----------------------------
@@ -23,63 +23,67 @@ img2 = get_base64_image("Image2.jpg")
 img3 = get_base64_image("Image3.jpg")
 img4 = get_base64_image("Image4.jpg")
 
-# Controle de estado
 if "page" not in st.session_state:
     st.session_state.page = "home"
 
 # -----------------------------
-# CSS GLOBAL E ESTILIZAÇÃO
+# CSS PARA FIXAR O TAMANHO DA TELA (VIEWPORT)
 # -----------------------------
 st.markdown("""
 <style>
+    /* Esconde elementos padrão do Streamlit e trava o scroll */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
     
-    .main {
+    /* Força a página a ocupar exatamente o tamanho da tela do dispositivo */
+    .main .block-container {
+        padding-top: 2rem;
+        padding-bottom: 0rem;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    body {
+        overflow: hidden;
         background-color: #fff0f5;
     }
-    
-    /* Estilo dos botões nativos do Streamlit */
+
+    /* Estilo dos botões nativos */
     .stButton > button {
         background-color: #ff4d6d !important;
         color: white !important;
         border-radius: 10px !important;
-        padding: 12px 28px !important;
+        padding: 10px 25px !important;
         font-size: 18px !important;
         border: none !important;
         display: block;
         margin: 0 auto;
         transition: 0.3s;
     }
-    .stButton > button:hover {
-        background-color: #e63950 !important;
-        transform: scale(1.05);
-    }
 
-    /* Animação das fotos no sentido horário */
+    /* Animação das fotos (Sentido Horário Suave) */
     @keyframes moveClockwise {
-        0%   { top: 20px; left: 20px; }
-        25%  { top: 20px; left: calc(100vw - 170px); }
-        50%  { top: calc(100vh - 170px); left: calc(100vw - 170px); }
-        75%  { top: calc(100vh - 170px); left: 20px; }
-        100% { top: 20px; left: 20px; }
+        0%   { top: 10px; left: 10px; }
+        25%  { top: 10px; left: calc(100vw - 110px); }
+        50%  { top: calc(100vh - 110px); left: calc(100vw - 110px); }
+        75%  { top: calc(100vh - 110px); left: 10px; }
+        100% { top: 10px; left: 10px; }
     }
 
     .moving-img {
         position: fixed;
-        width: 150px;
+        width: 100px; /* Tamanho reduzido */
         z-index: 999;
-        border-radius: 15px;
-        border: 3px solid #ff4d6d;
-        animation: moveClockwise 12s linear infinite;
+        border-radius: 12px;
+        border: 2px solid #ff4d6d;
+        animation: moveClockwise 25s linear infinite; /* Velocidade menor */
     }
 
-    /* Diferentes delays para as imagens não ficarem uma em cima da outra */
     .img-1 { animation-delay: 0s; }
-    .img-2 { animation-delay: -3s; }
-    .img-3 { animation-delay: -6s; }
-    .img-4 { animation-delay: -9s; }
+    .img-2 { animation-delay: -6.25s; }
+    .img-3 { animation-delay: -12.5s; }
+    .img-4 { animation-delay: -18.75s; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -89,19 +93,20 @@ st.markdown("""
 if st.session_state.page == "home":
     
     st.markdown(f"""
-        <div style="text-align: center; padding-top: 50px;">
-            <img src="data:image/jpg;base64,{img_home}" width="300" style="border-radius: 20px; box-shadow: 0px 4px 15px rgba(0,0,0,0.1);">
-            <h2 style="color: #ff4d6d; font-family: Arial;">Aceitas sair comigo na Sexta para uma noite especial? 💖</h2>
+        <div style="text-align: center; height: 40vh; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+            <img src="data:image/jpg;base64,{img_home}" width="250" style="border-radius: 20px; box-shadow: 0px 4px 15px rgba(0,0,0,0.1);">
+            <h2 style="color: #ff4d6d; font-family: Arial; margin-top: 20px;">Aceitas sair comigo na Sexta? 💖</h2>
         </div>
     """, unsafe_allow_html=True)
 
+    # Botão Sim Centralizado
     col1, col2, col3, col4, col5 = st.columns(5)
     with col3:
         if st.button("Sim 💘"):
             st.session_state.page = "sim"
             st.rerun()
 
-    # Componente HTML para o botão "Não" fugitivo
+    # Botão "Não" que foge dentro da tela visível
     html_nao = f"""
     <html>
     <head>
@@ -109,7 +114,7 @@ if st.session_state.page == "home":
         .btn-nao {{
             background-color: #ff4d6d;
             color: white;
-            padding: 12px 28px;
+            padding: 10px 25px;
             font-size: 18px;
             border-radius: 10px;
             border: none;
@@ -117,34 +122,33 @@ if st.session_state.page == "home":
             position: fixed;
             z-index: 1000;
             font-family: Arial;
-            transition: 0.1s;
         }}
     </style>
     </head>
     <body>
-        <button id="nao" class="btn-nao" style="top: 70%; left: 50%; transform: translateX(-50%);">Não 😢</button>
+        <button id="nao" class="btn-nao" style="top: 65%; left: 50%; transform: translateX(-50%);">Não 😢</button>
 
         <script>
             const btnNao = document.getElementById("nao");
             
             btnNao.addEventListener("mouseover", () => {{
-                // Calcula limites para o botão não sair da tela (viewport)
-                const padding = 20;
-                const maxX = window.innerWidth - btnNao.offsetWidth - padding;
-                const maxY = window.innerHeight - btnNao.offsetHeight - padding;
+                // Usa window.innerWidth/Height para garantir o limite da tela atual
+                const margin = 30;
+                const maxX = window.innerWidth - btnNao.offsetWidth - margin;
+                const maxY = window.innerHeight - btnNao.offsetHeight - margin;
 
-                const newX = Math.max(padding, Math.random() * maxX);
-                const newY = Math.max(padding, Math.random() * maxY);
+                const newX = Math.max(margin, Math.random() * maxX);
+                const newY = Math.max(margin, Math.random() * maxY);
 
                 btnNao.style.left = newX + "px";
                 btnNao.style.top = newY + "px";
-                btnNao.style.transform = "none"; // Remove a centralização inicial após o primeiro movimento
+                btnNao.style.transform = "none";
             }});
         </script>
     </body>
     </html>
     """
-    components.html(html_nao, height=500)
+    components.html(html_nao, height=200) # Componente menor para não criar scroll
 
 # -----------------------------
 # TELA DO SIM
@@ -152,21 +156,22 @@ if st.session_state.page == "home":
 elif st.session_state.page == "sim":
     
     st.markdown(f"""
-        <div style="text-align: center; padding-top: 50px; margin-bottom: 20px;">
-            <img src="data:image/jpg;base64,{img_sim}" width="400" style="border-radius: 20px;">
-            <h1 style="color: #ff4d6d;">Uma noite especial está por vir ✨</h1>
-            <h3 style="color: #333;">Porque ao seu lado qualquer sexta vira mágica ❤️</h3>
+        <div style="text-align: center; padding-top: 5vh;">
+            <img src="data:image/jpg;base64,{img_sim}" width="350" style="border-radius: 20px;">
+            <h1 style="color: #ff4d6d;">Combinado! ✨</h1>
+            <h3 style="color: #333;">Prepare o coração para uma noite mágica ❤️</h3>
         </div>
     """, unsafe_allow_html=True)
 
-    # Botão voltar centralizado
+    # Botão Voltar centralizado
+    st.write("") # Espaçamento
     col1, col2, col3, col4, col5 = st.columns(5)
     with col3:
         if st.button("Voltar"):
             st.session_state.page = "home"
             st.rerun()
 
-    # Imagens animadas em sentido horário
+    # Imagens rodando sincronizadas com o tamanho da tela
     st.markdown(f"""
         <img src="data:image/jpg;base64,{img1}" class="moving-img img-1">
         <img src="data:image/jpg;base64,{img2}" class="moving-img img-2">
