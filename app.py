@@ -129,41 +129,7 @@ if st.session_state.page == "home":
             st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # Botão Não com script corrigido para mover ao encostar
-    st.markdown("""
-        <button id="nao-button">Não 😢</button>
-        
-        <script>
-        (function() {
-            const btn = document.getElementById("nao-button");
 
-            const mover = () => {
-                const winW = window.innerWidth;
-                const winH = window.innerHeight;
-                
-                // Define limites para o botão não sair da tela
-                const maxX = winW - 150;
-                const maxY = winH - 50;
-
-                // Gera posição aleatória
-                const randomX = Math.floor(Math.random() * maxX);
-                const randomY = Math.floor(Math.random() * maxY);
-
-                btn.style.left = randomX + "px";
-                btn.style.top = randomY + "px";
-            };
-
-            // Evento: Quando o mouse entra na área do botão
-            btn.addEventListener("mouseover", mover);
-            
-            // Evento: Caso alguém consiga clicar ou use touch
-            btn.addEventListener("click", (e) => {
-                e.preventDefault();
-                mover();
-            });
-        })();
-        </script>
-    """, unsafe_allow_html=True)
 
 # -----------------------------
 # TELA DO SIM
