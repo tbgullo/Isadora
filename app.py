@@ -31,12 +31,14 @@ if "page" not in st.session_state:
 # -----------------------------
 st.markdown(f"""
 <style>
-    /* Trava total contra rolagem */
+    /* Trava total contra rolagem e fixa o viewport */
     html, body, [data-testid="stAppViewContainer"], .main {{
         overflow: hidden !important;
         height: 100vh !important;
         width: 100vw !important;
         position: fixed;
+        margin: 0;
+        padding: 0;
     }}
 
     [data-testid="stAppViewContainer"] {{
@@ -49,6 +51,7 @@ st.markdown(f"""
         flex-direction: column;
         justify-content: center;
         padding: 0 !important;
+        max-width: 100%;
     }}
 
     #MainMenu, footer, header {{visibility: hidden;}}
@@ -56,6 +59,7 @@ st.markdown(f"""
     h1, h2, h3 {{
         color: #d63384 !important;
         font-family: 'Segoe UI', Arial, sans-serif;
+        text-align: center;
     }}
 
     /* Botões Sim e Voltar */
@@ -69,6 +73,7 @@ st.markdown(f"""
         border: none !important;
         box-shadow: 0 4px 10px rgba(255, 77, 109, 0.3) !important;
         width: 140px;
+        display: block;
         margin: 0 auto;
     }}
 
@@ -84,7 +89,7 @@ st.markdown(f"""
     .moving-img {{
         position: fixed;
         width: 80px;
-        z-index: 999;
+        z-index: 99;
         border-radius: 50%;
         border: 3px solid white;
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
@@ -104,7 +109,7 @@ st.markdown(f"""
 if st.session_state.page == "home":
     
     st.markdown(f"""
-        <div style="text-align: center; margin-bottom: 10px;">
+        <div style="text-align: center; margin-bottom: 20px;">
             <div style="display: inline-block; padding: 10px; background: white; border-radius: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
                 <img src="data:image/jpg;base64,{img_home}" width="220" style="border-radius: 20px;">
             </div>
@@ -112,74 +117,67 @@ if st.session_state.page == "home":
         </div>
     """, unsafe_allow_html=True)
 
-    col_vazia1, col_sim, col_nao, col_vazia2 = st.columns([2, 1, 1, 2])
-    
-    with col_sim:
+    # Colunas apenas para centralizar o Sim (o Não será injetado via HTML global)
+    col1, col2, col3 = st.columns([1, 1, 1])
+    with col2:
         if st.button("Sim 💘"):
             st.session_state.page = "sim"
             st.rerun()
 
-    with col_nao:
-        # Script inteligente para fuga do botão "Não"
-        html_nao = f"""
-        <html>
-        <body style="background:transparent; margin:0; overflow:hidden; width: 100vw; height: 100vh;">
-            <button id="nao" style="
-                background-color: #ffb6c1;
-                color: white;
-                padding: 10px 0;
-                width: 140px;
-                font-size: 18px;
-                border-radius: 50px;
-                border: 2px solid white;
-                cursor: pointer;
-                font-family: Arial;
-                font-weight: bold;
-                box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-                position: absolute;
-                left: 0; top: 0;
-            ">Não 😢</button>
+    # Injeção do botão "Não" de forma GLOBAL na página
+    html_nao_global = f"""
+    <div id="container-nao" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999;">
+        <button id="nao" style="
+            pointer-events: auto;
+            background-color: #ffb6c1;
+            color: white;
+            padding: 10px 0;
+            width: 140px;
+            font-size: 18px;
+            border-radius: 50px;
+            border: 2px solid white;
+            cursor: pointer;
+            font-family: Arial;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            position: absolute;
+            left: 55%; /* Começa ao lado do botão sim */
+            top: 70%; /* Alinhado verticalmente com o botão sim */
+            transform: translateX(20px);
+            transition: 0.1s ease;
+        ">Não 😢</button>
+    </div>
 
-            <script>
-                const btn = document.getElementById("nao");
-                
-                btn.addEventListener("mouseover", () => {{
-                    // Pega o tamanho da janela
-                    const winW = window.innerWidth;
-                    const winH = window.innerHeight;
-                    
-                    // Define áreas seguras (longe do centro onde está a imagem e o botão Sim)
-                    // O botão vai fugir para as extremidades da tela
-                    let newX, newY;
-                    
-                    // Lógica: Se estiver no meio, foge para os cantos aleatoriamente
-                    const side = Math.floor(Math.random() * 4);
-                    
-                    if(side === 0) {{ // Canto superior
-                        newX = Math.random() * (winW - 150);
-                        newY = Math.random() * (winH * 1.2);
-                    }} else if(side === 1) {{ // Canto inferior
-                        newX = Math.random() * (winW - 150);
-                        newY = winH - 60 - (Math.random() * (winH * 1.2));
-                    }} else if(side === 2) {{ // Lateral esquerda
-                        newX = Math.random() * (winW * 1.2);
-                        newY = Math.random() * (winH - 60);
-                    }} else {{ // Lateral direita
-                        newX = winW - 150 - (Math.random() * (winW * 1.2));
-                        newY = Math.random() * (winH - 60);
-                    }}
+    <script>
+        const btn = document.getElementById("nao");
+        
+        btn.addEventListener("mouseover", () => {{
+            const winW = window.innerWidth;
+            const winH = window.innerHeight;
+            
+            // Define o tamanho do botão para não vazar
+            const btnW = 140;
+            const btnH = 45;
 
-                    btn.style.position = "fixed";
-                    btn.style.left = newX + "px";
-                    btn.style.top = newY + "px";
-                }});
-            </script>
-        </body>
-        </html>
-        """
-        # O iframe do botão Não agora ocupa a tela toda para ele poder fugir para qualquer lugar
-        # mas sem interferir no clique do botão Sim
-        st.components.v1.html(html_nao, height=60)
+            // Gera posições aleatórias dentro de TODA a tela
+            let newX = Math.random() * (winW - btnW - 20);
+            let newY = Math.random() * (winH - btnH - 20);
+
+            // Evita que ele fique exatamente no meio (onde está o Sim e a Imagem)
+            // Se as coordenadas caírem no centro, empurramos para as bordas
+            if (newX > winW * 0.3 && newX < winW * 0.7 && newY > winH * 0.3 && newY < winH * 0.7) {{
+                newX = newX < winW * 0.5 ? 50 : winW - btnW - 50;
+                newY = newY < winH * 0.5 ? 50 : winH - btnH - 50;
+            }}
+
+            btn.style.left = newX + "px";
+            btn.style.top = newY + "px";
+            btn.style.transform = "none";
+        }});
+    </script>
+    """
+    # Usamos o components.html mas com altura 0 ou ocupando a tela toda de forma invisível
+    components.html(html_nao_global, height=1000)
 
 # -----------------------------
 # TELA DO SIM
@@ -196,8 +194,8 @@ elif st.session_state.page == "sim":
         </div>
     """, unsafe_allow_html=True)
 
-    col1, col2, col3, col4, col5 = st.columns(5)
-    with col3:
+    col1, col2, col3 = st.columns([1, 1, 1])
+    with col2:
         if st.button("Voltar"):
             st.session_state.page = "home"
             st.rerun()
