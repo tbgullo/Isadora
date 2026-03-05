@@ -1,5 +1,6 @@
 import streamlit as st
 import base64
+import random
 
 # Configuração da página
 st.set_page_config(layout="wide", page_title="Convite Especial 💖")
@@ -44,6 +45,7 @@ st.markdown(f"""
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        position: relative;
     }}
 
     #MainMenu, footer, header {{visibility: hidden;}}
@@ -64,26 +66,25 @@ st.markdown(f"""
         border: none !important;
         box-shadow: 0 4px 10px rgba(255, 77, 109, 0.3) !important;
         width: 140px;
+        cursor: pointer;
     }}
 
-    /* Estilo do Botão Não (HTML Puro) */
+    /* Botão Não Fugitivo */
     #btn-nao {{
-        position: relative;
-        background: #ffb6c1;
+        position: absolute;
+        background: #6c757d;
         color: white;
-        padding: 10px 30px;
-        width: 140px;
-        font-size: 18px;
         border-radius: 50px;
-        border: 2px solid white;
-        cursor: pointer;
-        font-family: Arial;
+        padding: 10px 30px;
+        font-size: 18px;
         font-weight: bold;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        z-index: 9999;
+        border: none;
+        width: 140px;
+        cursor: pointer;
         transition: all 0.2s ease;
-        left: 55%;
-        top: 70%;
+        z-index: 1000;
+        left: 55%; /* Posição inicial */
+        top: 65%;
     }}
 
     .moving-img {{
@@ -107,12 +108,18 @@ st.markdown(f"""
 <script>
     function moveButton() {{
         const btn = document.getElementById('btn-nao');
-        // Calcula posições aleatórias dentro da tela (descontando o tamanho do botão)
-        const x = Math.random() * (window.innerWidth - btn.offsetWidth);
-        const y = Math.random() * (window.innerHeight - btn.offsetHeight);
+        const padding = 50;
         
-        btn.style.left = x + 'px';
-        btn.style.top = y + 'px';
+        // Calcula limites da tela
+        const maxX = window.innerWidth - btn.offsetWidth - padding;
+        const maxY = window.innerHeight - btn.offsetHeight - padding;
+        
+        // Gera posições aleatórias
+        const randomX = Math.max(padding, Math.floor(Math.random() * maxX));
+        const randomY = Math.max(padding, Math.floor(Math.random() * maxY));
+        
+        btn.style.left = randomX + 'px';
+        btn.style.top = randomY + 'px';
     }}
 </script>
 """, unsafe_allow_html=True)
@@ -131,22 +138,20 @@ if st.session_state.page == "home":
         </div>
     """, unsafe_allow_html=True)
 
+    # Container para os botões
     col1, col2, col3 = st.columns([1, 1, 1])
     with col2:
-        # O Sim permanece como botão do Streamlit para mudar o state do Python
+        # Botão Sim funcional
         if st.button("Sim 💘"):
             st.session_state.page = "sim"
             st.rerun()
-
-    # O botão "Não" é injetado via HTML puro para suportar o JS de movimento
-    st.markdown("""
-        <button id="btn-nao" 
-                onmouseover="moveButton()" 
-                onclick="moveButton()" 
-                ontouchstart="moveButton()">
-            Não 😢
-        </button>
-    """, unsafe_allow_html=True)
+        
+        # Botão Não (HTML puro para o JS controlar)
+        st.markdown("""
+            <button id="btn-nao" onmouseover="moveButton()" onclick="moveButton()" ontouchstart="moveButton()">
+                Não 😢
+            </button>
+        """, unsafe_allow_html=True)
 
 # -----------------------------
 # TELA DO SIM
