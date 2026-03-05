@@ -1,6 +1,6 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import base64
-import random
 
 # Configuração da página
 st.set_page_config(layout="wide", page_title="Convite Especial 💖")
@@ -23,45 +23,38 @@ img4 = get_base64_image("Image4.jpg")
 if "page" not in st.session_state:
     st.session_state.page = "home"
 
-# Inicializa posição aleatória do botão Não
-if "nao_x" not in st.session_state:
-    st.session_state.nao_x = random.randint(5, 85)
-
-if "nao_y" not in st.session_state:
-    st.session_state.nao_y = random.randint(10, 85)
-
 # -----------------------------
-# CSS
+# CSS GLOBAL
 # -----------------------------
-st.markdown(f"""
+st.markdown("""
 <style>
-    html, body, [data-testid="stAppViewContainer"], .main, .block-container {{
+    html, body, [data-testid="stAppViewContainer"], .main, .block-container {
         overflow: hidden !important;
         height: 100vh !important;
         width: 100vw !important;
         margin: 0 !important;
         padding: 0 !important;
-    }}
+    }
 
-    [data-testid="stAppViewContainer"] {{
+    [data-testid="stAppViewContainer"] {
         background: linear-gradient(135deg, #fff5f7 0%, #ffe4e1 100%);
-    }}
+    }
     
-    .main .block-container {{
+    .main .block-container {
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-    }}
+    }
 
-    #MainMenu, footer, header {{visibility: hidden;}}
+    #MainMenu, footer, header {visibility: hidden;}
 
-    h1, h2, h3 {{
+    h1, h2, h3 {
         color: #d63384 !important;
         font-family: 'Segoe UI', Arial, sans-serif;
-    }}
+    }
 
-    .stButton > button {{
+    .stButton > button {
         background: linear-gradient(90deg, #ff4d6d, #ff758c) !important;
         color: white !important;
         border-radius: 50px !important;
@@ -71,42 +64,24 @@ st.markdown(f"""
         border: none !important;
         box-shadow: 0 4px 10px rgba(255, 77, 109, 0.3) !important;
         width: 140px;
-    }}
+    }
 
-    .btn-nao-style {{
-        position: fixed !important;
-        left: {st.session_state.nao_x}vw !important;
-        top: {st.session_state.nao_y}vh !important;
-        background: #ffb6c1 !important;
-        color: white !important;
-        padding: 10px 30px !important;
-        width: 140px !important;
-        font-size: 18px !important;
-        border-radius: 50px !important;
-        border: 2px solid white !important;
-        cursor: pointer !important;
-        font-family: Arial !important;
-        font-weight: bold !important;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1) !important;
-        z-index: 9999 !important;
-    }}
-
-    .moving-img {{
+    .moving-img {
         position: fixed;
         width: 80px;
         z-index: 99;
         border-radius: 50%;
         border: 3px solid white;
         animation: moveClockwise 30s linear infinite;
-    }}
+    }
 
-    @keyframes moveClockwise {{
-        0%   {{ top: 15px; left: 15px; }}
-        25%  {{ top: 15px; left: calc(100vw - 100px); }}
-        50%  {{ top: calc(100vh - 100px); left: calc(100vw - 100px); }}
-        75%  {{ top: calc(100vh - 100px); left: 15px; }}
-        100% {{ top: 15px; left: 15px; }}
-    }}
+    @keyframes moveClockwise {
+        0%   { top: 15px; left: 15px; }
+        25%  { top: 15px; left: calc(100vw - 100px); }
+        50%  { top: calc(100vh - 100px); left: calc(100vw - 100px); }
+        75%  { top: calc(100vh - 100px); left: 15px; }
+        100% { top: 15px; left: 15px; }
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -124,33 +99,67 @@ if st.session_state.page == "home":
         </div>
     """, unsafe_allow_html=True)
 
-    # Botão SIM central
+    # Botão SIM
     col1, col2, col3 = st.columns([1, 1, 1])
     with col2:
         if st.button("Sim 💘"):
             st.session_state.page = "sim"
             st.rerun()
 
-    # Botão NÃO
-    nao_clicked = st.button("Não 😢", key="nao_btn")
+    # -----------------------------
+    # BOTÃO NÃO FUGINDO (components.html)
+    # -----------------------------
+    html_nao = """
+    <html>
+    <head>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: transparent;
+        }
+        .btn-nao {
+            background: linear-gradient(45deg, #ff4d6d, #ff8fab);
+            color: white;
+            padding: 12px 28px;
+            font-size: 18px;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            position: fixed;
+            z-index: 1000;
+            font-family: Arial;
+            box-shadow: 0px 6px 15px rgba(255, 77, 109, 0.4);
+        }
+    </style>
+    </head>
+    <body>
+        <button id="nao" class="btn-nao"
+            style="top: 75%; left: 50%; transform: translateX(-50%);">
+            Não 😢
+        </button>
 
-    # Aplica estilo ao botão NÃO
-    st.markdown("""
         <script>
-        const buttons = window.parent.document.querySelectorAll('button');
-        buttons.forEach(btn => {
-            if(btn.innerText.includes("Não")) {
-                btn.classList.add("btn-nao-style");
-            }
-        });
-        </script>
-    """, unsafe_allow_html=True)
+            const btnNao = document.getElementById("nao");
 
-    # Se clicar, gera nova posição e recria
-    if nao_clicked:
-        st.session_state.nao_x = random.randint(5, 85)
-        st.session_state.nao_y = random.randint(10, 85)
-        st.rerun()
+            btnNao.addEventListener("mouseover", () => {
+                const margin = 40;
+                const maxX = window.innerWidth - btnNao.offsetWidth - margin;
+                const maxY = window.innerHeight - btnNao.offsetHeight - margin;
+
+                const newX = Math.max(margin, Math.random() * maxX);
+                const newY = Math.max(margin, Math.random() * maxY);
+
+                btnNao.style.left = newX + "px";
+                btnNao.style.top = newY + "px";
+                btnNao.style.transform = "none";
+            });
+        </script>
+    </body>
+    </html>
+    """
+
+    components.html(html_nao, height=200)
 
 # -----------------------------
 # TELA DO SIM
