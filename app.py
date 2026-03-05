@@ -23,38 +23,37 @@ if "page" not in st.session_state:
     st.session_state.page = "home"
 
 # -----------------------------
-# CSS GLOBAL
+# CSS E LOGICA DE FUGA (JS)
 # -----------------------------
-st.markdown(f"""
+st.markdown("""
 <style>
-    html, body, [data-testid="stAppViewContainer"], .main, .block-container {{
+    /* Reset básico */
+    html, body, [data-testid="stAppViewContainer"] {
         overflow: hidden !important;
-        height: 100vh !important;
-        width: 100vw !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }}
+        height: 100vh;
+        width: 100vw;
+    }
 
-    [data-testid="stAppViewContainer"] {{
-        background: linear-gradient(135deg, #fff5f7 0%, #ffe4e1 100%);
-    }}
-    
-    .main .block-container {{
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }}
+    /* Estilo do Botão Não */
+    #btn-nao {
+        position: fixed;
+        left: 55vw;
+        top: 65vh;
+        background-color: #6c757d;
+        color: white;
+        border: none;
+        padding: 12px 35px;
+        font-size: 18px;
+        font-weight: bold;
+        border-radius: 50px;
+        cursor: pointer;
+        z-index: 1000000;
+        transition: 0.1s ease;
+        touch-action: none; /* Impede zoom no mobile ao tocar rápido */
+    }
 
-    #MainMenu, footer, header {{visibility: hidden;}}
-
-    h1, h2, h3 {{
-        color: #d63384 !important;
-        font-family: 'Segoe UI', Arial, sans-serif;
-    }}
-
-    /* Botão Sim (Original Streamlit) */
-    .stButton > button {{
+    /* Estilo do Botão Sim do Streamlit */
+    .stButton > button {
         background: linear-gradient(90deg, #ff4d6d, #ff758c) !important;
         color: white !important;
         border-radius: 50px !important;
@@ -62,28 +61,32 @@ st.markdown(f"""
         font-size: 18px !important;
         font-weight: bold !important;
         border: none !important;
-        box-shadow: 0 4px 10px rgba(255, 77, 109, 0.3) !important;
         width: 140px;
-    }}
-
-    /* Estilo do Botão Não Fugitivo */
-    .btn-nao-style {{
-        position: fixed;
-        background: #6c757d;
-        color: white;
-        border-radius: 50px;
-        padding: 10px 30px;
-        font-size: 18px;
-        font-weight: bold;
-        border: none;
-        width: 140px;
-        cursor: pointer;
-        z-index: 9999;
-        transition: 0.1s;
-        left: 52%;
-        top: 65%;
-    }}
+    }
 </style>
+
+<script>
+    function foge() {
+        const btn = document.getElementById('btn-nao');
+        if (!btn) return;
+
+        // Largura e altura da tela disponível
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        // Calcula novas posições (mantendo margem de 100px para não sumir da borda)
+        const newX = Math.random() * (width - 150);
+        const newY = Math.random() * (height - 100);
+
+        btn.style.left = newX + 'px';
+        btn.style.top = newY + 'px';
+    }
+
+    // Tenta garantir que o botão exista antes de anexar eventos se necessário
+    document.addEventListener('mouseover', function(e) {
+        if(e.target.id === 'btn-nao') foge();
+    });
+</script>
 """, unsafe_allow_html=True)
 
 # -----------------------------
@@ -96,38 +99,26 @@ if st.session_state.page == "home":
             <div style="display: inline-block; padding: 10px; background: white; border-radius: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
                 <img src="data:image/jpg;base64,{img_home}" width="220" style="border-radius: 20px;">
             </div>
-            <h2 style="margin-top: 15px;">Aceitas sair comigo na Sexta? 💖</h2>
+            <h2 style="color: #d63384; font-family: sans-serif; margin-top: 15px;">Aceitas sair comigo na Sexta? 💖</h2>
         </div>
     """, unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns([1, 1, 1])
     with col2:
-        # Botão Sim
+        # Botão Sim que funciona no Streamlit
         if st.button("Sim 💘"):
             st.session_state.page = "sim"
             st.rerun()
-        
-        # Botão Não com Script embutido para garantir execução
-        st.markdown("""
-            <button id="btn-nao" class="btn-nao-style" 
-                onmouseover="foge(this)" 
-                onclick="foge(this)" 
-                ontouchstart="foge(this)">
-                Não 😢
-            </button>
 
-            <script>
-                function foge(btn) {
-                    // Calcula novas posições aleatórias dentro da janela
-                    var x = Math.random() * (window.innerWidth - btn.offsetWidth - 40);
-                    var y = Math.random() * (window.innerHeight - btn.offsetHeight - 40);
-                    
-                    btn.style.position = 'fixed';
-                    btn.style.left = x + 'px';
-                    btn.style.top = y + 'px';
-                }
-            </script>
-        """, unsafe_allow_html=True)
+    # Botão Não injetado via HTML puro com gatilhos forçados
+    st.markdown("""
+        <button id="btn-nao" 
+            onmouseover="foge()" 
+            onclick="foge()" 
+            ontouchstart="foge()">
+            Não 😢
+        </button>
+    """, unsafe_allow_html=True)
 
 # -----------------------------
 # TELA DO SIM
@@ -138,34 +129,11 @@ elif st.session_state.page == "sim":
             <div style="display: inline-block; padding: 10px; background: white; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
                 <img src="data:image/jpg;base64,{img_sim}" width="320" style="border-radius: 20px;">
             </div>
-            <h1 style="margin-top: 20px;">Vai ser uma noite memorável! ✨</h1>
+            <h1 style="color: #d63384; margin-top: 20px;">Vai ser uma noite memorável! ✨</h1>
             <h3 style="color: #666;">Para você nunca se esquecer de mim ❤️</h3>
         </div>
     """, unsafe_allow_html=True)
 
-    col1, col2, col3 = st.columns([1, 1, 1])
-    with col2:
-        if st.button("Voltar"):
-            st.session_state.page = "home"
-            st.rerun()
-
-    # Imagens flutuantes
-    st.markdown(f"""
-        <style>
-            .moving-img {{
-                position: fixed; width: 80px; z-index: 99; border-radius: 50%;
-                border: 3px solid white; animation: moveClockwise 30s linear infinite;
-            }}
-            @keyframes moveClockwise {{
-                0% {{ top: 15px; left: 15px; }}
-                25% {{ top: 15px; left: calc(100vw - 100px); }}
-                50% {{ top: calc(100vh - 100px); left: calc(100vw - 100px); }}
-                75% {{ top: calc(100vh - 100px); left: 15px; }}
-                100% {{ top: 15px; left: 15px; }}
-            }}
-        </style>
-        <img src="data:image/jpg;base64,{img1}" class="moving-img" style="animation-delay: 0s;">
-        <img src="data:image/jpg;base64,{img2}" class="moving-img" style="animation-delay: -7.5s;">
-        <img src="data:image/jpg;base64,{img3}" class="moving-img" style="animation-delay: -15s;">
-        <img src="data:image/jpg;base64,{img4}" class="moving-img" style="animation-delay: -22.5s;">
-    """, unsafe_allow_html=True)
+    if st.button("Voltar"):
+        st.session_state.page = "home"
+        st.rerun()
