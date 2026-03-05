@@ -1,6 +1,5 @@
 import streamlit as st
 import base64
-import random
 
 # Configuração da página
 st.set_page_config(layout="wide", page_title="Convite Especial 💖")
@@ -24,7 +23,7 @@ if "page" not in st.session_state:
     st.session_state.page = "home"
 
 # -----------------------------
-# CSS E JAVASCRIPT
+# CSS GLOBAL
 # -----------------------------
 st.markdown(f"""
 <style>
@@ -45,7 +44,6 @@ st.markdown(f"""
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        position: relative;
     }}
 
     #MainMenu, footer, header {{visibility: hidden;}}
@@ -55,7 +53,7 @@ st.markdown(f"""
         font-family: 'Segoe UI', Arial, sans-serif;
     }}
 
-    /* Botão Sim (Streamlit) */
+    /* Botão Sim (Original Streamlit) */
     .stButton > button {{
         background: linear-gradient(90deg, #ff4d6d, #ff758c) !important;
         color: white !important;
@@ -66,12 +64,11 @@ st.markdown(f"""
         border: none !important;
         box-shadow: 0 4px 10px rgba(255, 77, 109, 0.3) !important;
         width: 140px;
-        cursor: pointer;
     }}
 
-    /* Botão Não Fugitivo */
-    #btn-nao {{
-        position: absolute;
+    /* Estilo do Botão Não Fugitivo */
+    .btn-nao-style {{
+        position: fixed;
         background: #6c757d;
         color: white;
         border-radius: 50px;
@@ -81,47 +78,12 @@ st.markdown(f"""
         border: none;
         width: 140px;
         cursor: pointer;
-        transition: all 0.2s ease;
-        z-index: 1000;
-        left: 55%; /* Posição inicial */
+        z-index: 9999;
+        transition: 0.1s;
+        left: 52%;
         top: 65%;
     }}
-
-    .moving-img {{
-        position: fixed;
-        width: 80px;
-        z-index: 99;
-        border-radius: 50%;
-        border: 3px solid white;
-        animation: moveClockwise 30s linear infinite;
-    }}
-
-    @keyframes moveClockwise {{
-        0%   {{ top: 15px; left: 15px; }}
-        25%  {{ top: 15px; left: calc(100vw - 100px); }}
-        50%  {{ top: calc(100vh - 100px); left: calc(100vw - 100px); }}
-        75%  {{ top: calc(100vh - 100px); left: 15px; }}
-        100% {{ top: 15px; left: 15px; }}
-    }}
 </style>
-
-<script>
-    function moveButton() {{
-        const btn = document.getElementById('btn-nao');
-        const padding = 50;
-        
-        // Calcula limites da tela
-        const maxX = window.innerWidth - btn.offsetWidth - padding;
-        const maxY = window.innerHeight - btn.offsetHeight - padding;
-        
-        // Gera posições aleatórias
-        const randomX = Math.max(padding, Math.floor(Math.random() * maxX));
-        const randomY = Math.max(padding, Math.floor(Math.random() * maxY));
-        
-        btn.style.left = randomX + 'px';
-        btn.style.top = randomY + 'px';
-    }}
-</script>
 """, unsafe_allow_html=True)
 
 # -----------------------------
@@ -138,26 +100,39 @@ if st.session_state.page == "home":
         </div>
     """, unsafe_allow_html=True)
 
-    # Container para os botões
     col1, col2, col3 = st.columns([1, 1, 1])
     with col2:
-        # Botão Sim funcional
+        # Botão Sim
         if st.button("Sim 💘"):
             st.session_state.page = "sim"
             st.rerun()
         
-        # Botão Não (HTML puro para o JS controlar)
+        # Botão Não com Script embutido para garantir execução
         st.markdown("""
-            <button id="btn-nao" onmouseover="moveButton()" onclick="moveButton()" ontouchstart="moveButton()">
+            <button id="btn-nao" class="btn-nao-style" 
+                onmouseover="foge(this)" 
+                onclick="foge(this)" 
+                ontouchstart="foge(this)">
                 Não 😢
             </button>
+
+            <script>
+                function foge(btn) {
+                    // Calcula novas posições aleatórias dentro da janela
+                    var x = Math.random() * (window.innerWidth - btn.offsetWidth - 40);
+                    var y = Math.random() * (window.innerHeight - btn.offsetHeight - 40);
+                    
+                    btn.style.position = 'fixed';
+                    btn.style.left = x + 'px';
+                    btn.style.top = y + 'px';
+                }
+            </script>
         """, unsafe_allow_html=True)
 
 # -----------------------------
 # TELA DO SIM
 # -----------------------------
 elif st.session_state.page == "sim":
-    
     st.markdown(f"""
         <div style="text-align: center;">
             <div style="display: inline-block; padding: 10px; background: white; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
@@ -174,7 +149,21 @@ elif st.session_state.page == "sim":
             st.session_state.page = "home"
             st.rerun()
 
+    # Imagens flutuantes
     st.markdown(f"""
+        <style>
+            .moving-img {{
+                position: fixed; width: 80px; z-index: 99; border-radius: 50%;
+                border: 3px solid white; animation: moveClockwise 30s linear infinite;
+            }}
+            @keyframes moveClockwise {{
+                0% {{ top: 15px; left: 15px; }}
+                25% {{ top: 15px; left: calc(100vw - 100px); }}
+                50% {{ top: calc(100vh - 100px); left: calc(100vw - 100px); }}
+                75% {{ top: calc(100vh - 100px); left: 15px; }}
+                100% {{ top: 15px; left: 15px; }}
+            }}
+        </style>
         <img src="data:image/jpg;base64,{img1}" class="moving-img" style="animation-delay: 0s;">
         <img src="data:image/jpg;base64,{img2}" class="moving-img" style="animation-delay: -7.5s;">
         <img src="data:image/jpg;base64,{img3}" class="moving-img" style="animation-delay: -15s;">
