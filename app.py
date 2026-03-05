@@ -28,11 +28,10 @@ if "page" not in st.session_state:
     st.session_state.page = "home"
 
 # -----------------------------
-# CSS PARA DEIXAR TUDO BONITO
+# CSS GLOBAL E ESTILIZAÇÃO
 # -----------------------------
 st.markdown("""
 <style>
-    /* Esconde o menu do Streamlit e o rodapé */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
@@ -41,7 +40,7 @@ st.markdown("""
         background-color: #fff0f5;
     }
     
-    /* Centraliza o botão Sim do Streamlit */
+    /* Estilo dos botões nativos do Streamlit */
     .stButton > button {
         background-color: #ff4d6d !important;
         color: white !important;
@@ -57,6 +56,30 @@ st.markdown("""
         background-color: #e63950 !important;
         transform: scale(1.05);
     }
+
+    /* Animação das fotos no sentido horário */
+    @keyframes moveClockwise {
+        0%   { top: 20px; left: 20px; }
+        25%  { top: 20px; left: calc(100vw - 170px); }
+        50%  { top: calc(100vh - 170px); left: calc(100vw - 170px); }
+        75%  { top: calc(100vh - 170px); left: 20px; }
+        100% { top: 20px; left: 20px; }
+    }
+
+    .moving-img {
+        position: fixed;
+        width: 150px;
+        z-index: 999;
+        border-radius: 15px;
+        border: 3px solid #ff4d6d;
+        animation: moveClockwise 12s linear infinite;
+    }
+
+    /* Diferentes delays para as imagens não ficarem uma em cima da outra */
+    .img-1 { animation-delay: 0s; }
+    .img-2 { animation-delay: -3s; }
+    .img-3 { animation-delay: -6s; }
+    .img-4 { animation-delay: -9s; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -65,7 +88,6 @@ st.markdown("""
 # -----------------------------
 if st.session_state.page == "home":
     
-    # Título e Imagem central
     st.markdown(f"""
         <div style="text-align: center; padding-top: 50px;">
             <img src="data:image/jpg;base64,{img_home}" width="300" style="border-radius: 20px; box-shadow: 0px 4px 15px rgba(0,0,0,0.1);">
@@ -73,16 +95,13 @@ if st.session_state.page == "home":
         </div>
     """, unsafe_allow_html=True)
 
-    # Layout de colunas para os botões
     col1, col2, col3, col4, col5 = st.columns(5)
-    
     with col3:
-        # BOTÃO SIM (NATIVO STREAMLIT)
         if st.button("Sim 💘"):
             st.session_state.page = "sim"
             st.rerun()
 
-    # O componente HTML apenas para o botão "Não" que foge
+    # Componente HTML para o botão "Não" fugitivo
     html_nao = f"""
     <html>
     <head>
@@ -96,27 +115,36 @@ if st.session_state.page == "home":
             border: none;
             cursor: pointer;
             position: fixed;
-            z-index: 999;
+            z-index: 1000;
             font-family: Arial;
+            transition: 0.1s;
         }}
     </style>
     </head>
     <body>
-        <button id="nao" class="btn-nao" style="top: 70%; left: 55%;">Não 😢</button>
+        <button id="nao" class="btn-nao" style="top: 70%; left: 50%; transform: translateX(-50%);">Não 😢</button>
 
         <script>
             const btnNao = document.getElementById("nao");
+            
             btnNao.addEventListener("mouseover", () => {{
-                const x = Math.random() * (window.innerWidth - 150);
-                const y = Math.random() * (window.innerHeight - 50);
-                btnNao.style.left = x + "px";
-                btnNao.style.top = y + "px";
+                // Calcula limites para o botão não sair da tela (viewport)
+                const padding = 20;
+                const maxX = window.innerWidth - btnNao.offsetWidth - padding;
+                const maxY = window.innerHeight - btnNao.offsetHeight - padding;
+
+                const newX = Math.max(padding, Math.random() * maxX);
+                const newY = Math.max(padding, Math.random() * maxY);
+
+                btnNao.style.left = newX + "px";
+                btnNao.style.top = newY + "px";
+                btnNao.style.transform = "none"; // Remove a centralização inicial após o primeiro movimento
             }});
         </script>
     </body>
     </html>
     """
-    components.html(html_nao, height=400)
+    components.html(html_nao, height=500)
 
 # -----------------------------
 # TELA DO SIM
@@ -124,28 +152,24 @@ if st.session_state.page == "home":
 elif st.session_state.page == "sim":
     
     st.markdown(f"""
-        <div style="text-align: center; padding-top: 50px;">
-            <img src="data:image/jpg;base64,{img_sim}" width="450" style="border-radius: 20px;">
+        <div style="text-align: center; padding-top: 50px; margin-bottom: 20px;">
+            <img src="data:image/jpg;base64,{img_sim}" width="400" style="border-radius: 20px;">
             <h1 style="color: #ff4d6d;">Uma noite especial está por vir ✨</h1>
             <h3 style="color: #333;">Porque ao seu lado qualquer sexta vira mágica ❤️</h3>
         </div>
     """, unsafe_allow_html=True)
 
-    if st.button("Voltar"):
-        st.session_state.page = "home"
-        st.rerun()
+    # Botão voltar centralizado
+    col1, col2, col3, col4, col5 = st.columns(5)
+    with col3:
+        if st.button("Voltar"):
+            st.session_state.page = "home"
+            st.rerun()
 
-    # Fotos nos cantos
+    # Imagens animadas em sentido horário
     st.markdown(f"""
-    <style>
-        .corner-img {{ position: fixed; width: 150px; z-index: 999; border-radius: 15px; border: 3px solid #ff4d6d; }}
-        .top-left {{ top: 20px; left: 20px; }}
-        .top-right {{ top: 20px; right: 20px; }}
-        .bottom-left {{ bottom: 20px; left: 20px; }}
-        .bottom-right {{ bottom: 20px; right: 20px; }}
-    </style>
-    <img src="data:image/jpg;base64,{img1}" class="corner-img top-left">
-    <img src="data:image/jpg;base64,{img2}" class="corner-img top-right">
-    <img src="data:image/jpg;base64,{img3}" class="corner-img bottom-left">
-    <img src="data:image/jpg;base64,{img4}" class="corner-img bottom-right">
+        <img src="data:image/jpg;base64,{img1}" class="moving-img img-1">
+        <img src="data:image/jpg;base64,{img2}" class="moving-img img-2">
+        <img src="data:image/jpg;base64,{img3}" class="moving-img img-3">
+        <img src="data:image/jpg;base64,{img4}" class="moving-img img-4">
     """, unsafe_allow_html=True)
