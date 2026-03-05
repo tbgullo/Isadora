@@ -171,8 +171,8 @@ elif st.session_state.page == "sim":
             <div style="display: inline-block; padding: 10px; background: white; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
                 <img src="data:image/jpg;base64,{img_sim}" width="320" style="border-radius: 20px;">
             </div>
-            <h1 style="margin-top: 20px;">Vai ser uma noite memorável! ✨</h1>
-            <h3 style="color: #666;">Para você nunca se esquecer de mim ❤️</h3>
+            <h1 style="margin-top: 20px;">Uma noite preparada nos mínimos detalhes</h1>
+            <h3 style="color: #333;">Para você nunca se esquecer de mim ❤️</h3>
         </div>
     """, unsafe_allow_html=True)
 
