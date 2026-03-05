@@ -142,40 +142,35 @@ if st.session_state.page == "home":
                 const initFoge = () => {
                     const btn = document.getElementById("nao-button");
                     if (!btn) {
-                        // Se o botão ainda não existir, tenta novamente em 100ms
                         setTimeout(initFoge, 100);
                         return;
                     }
 
                     const foge = (e) => {
                         e.preventDefault();
+
                         const winW = window.innerWidth;
                         const winH = window.innerHeight;
-                        const btnW = 140;
-                        const btnH = 45;
-                        
-                        // Garante que o botão fique dentro da área visível
-                        let newX = Math.random() * (winW - btnW - 40) + 20;
-                        let newY = Math.random() * (winH - btnH - 40) + 20;
-                        
-                        // Evita a área central
-                        if (newX > winW * 0.3 && newX < winW * 0.7 && newY > winH * 0.3 && newY < winH * 0.7) {
-                            newX = 20;
-                            newY = 20;
-                        }
+
+                        const btnW = btn.offsetWidth;
+                        const btnH = btn.offsetHeight;
+
+                        // Margem mínima para não colar na borda
+                        const margin = 10;
+
+                        // Posição totalmente aleatória dentro da tela visível
+                        const newX = Math.random() * (winW - btnW - margin * 2) + margin;
+                        const newY = Math.random() * (winH - btnH - margin * 2) + margin;
 
                         btn.style.left = newX + "px";
                         btn.style.top = newY + "px";
                     };
 
                     btn.addEventListener("mouseover", foge);
-                    btn.addEventListener("touchstart", foge); // Suporte para celular
-                    btn.addEventListener("click", (e) => {
-                        e.preventDefault();
-                        foge(e);
-                    });
+                    btn.addEventListener("touchstart", foge);
+                    btn.addEventListener("click", foge);
                 };
-                
+
                 initFoge();
             })();
         </script>
