@@ -4,9 +4,6 @@ import base64
 # Configuração da página
 st.set_page_config(layout="wide", page_title="Convite Especial 💖")
 
-# -----------------------------
-# Função para converter imagem
-# -----------------------------
 def get_base64_image(path):
     try:
         with open(path, "rb") as f:
@@ -14,7 +11,6 @@ def get_base64_image(path):
     except:
         return ""
 
-# Carregando imagens
 img_home = get_base64_image("Image.jpg")
 img_sim = get_base64_image("ImageSim.jpg")
 img1 = get_base64_image("Image1.jpg")
@@ -26,7 +22,7 @@ if "page" not in st.session_state:
     st.session_state.page = "home"
 
 # -----------------------------
-# CSS
+# CSS 
 # -----------------------------
 st.markdown(f"""
 <style>
@@ -36,7 +32,6 @@ st.markdown(f"""
         width: 100vw !important;
         margin: 0 !important;
         padding: 0 !important;
-        position: fixed !important;
     }}
 
     [data-testid="stAppViewContainer"] {{
@@ -87,7 +82,8 @@ st.markdown(f"""
         left: calc(50% + 15px);
         top: 72%;
         transform: translateY(-50%);
-        transition: left 0.2s ease, top 0.2s ease;
+        /* Transição rápida para a fuga parecer natural */
+        transition: left 0.1s ease, top 0.1s ease;
     }}
 
     .moving-img {{
@@ -110,11 +106,7 @@ st.markdown(f"""
 </style>
 """, unsafe_allow_html=True)
 
-# -----------------------------
-# TELA INICIAL
-# -----------------------------
 if st.session_state.page == "home":
-    
     st.markdown(f"""
         <div style="text-align: center; margin-bottom: 25px;">
             <div style="display: inline-block; padding: 10px; background: white; border-radius: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
@@ -132,72 +124,61 @@ if st.session_state.page == "home":
             st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # Botão Não com lógica corrigida
+    # BOTÃO NÃO COM FOCO EXCLUSIVO NO CONTATO (MOUSEOVER)
     st.markdown("""
         <button id="nao-button">Não 😢</button>
         
         <script>
         (function() {
-
-            function init() {
+            function setup() {
                 const btn = document.getElementById("nao-button");
                 if (!btn) {
-                    setTimeout(init, 100);
+                    setTimeout(setup, 100);
                     return;
                 }
 
-                function mover() {
-
-                    const rect = btn.getBoundingClientRect();
-                    const btnW = rect.width;
-                    const btnH = rect.height;
-
+                const foge = () => {
+                    // Tamanho da janela
                     const winW = window.innerWidth;
                     const winH = window.innerHeight;
+                    
+                    // Tamanho do botão
+                    const btnW = 140;
+                    const btnH = 45;
 
-                    const margem = 10;
+                    // Margem de segurança
+                    const margem = 30;
 
-                    const maxX = winW - btnW - margem;
-                    const maxY = winH - btnH - margem;
-
-                    const newX = Math.random() * (maxX - margem) + margem;
-                    const newY = Math.random() * (maxY - margem) + margem;
+                    // Gera nova posição aleatória dentro da tela
+                    const newX = Math.random() * (winW - btnW - (margem * 2)) + margem;
+                    const newY = Math.random() * (winH - btnH - (margem * 2)) + margem;
 
                     btn.style.left = newX + "px";
                     btn.style.top = newY + "px";
-                }
+                };
 
-                document.addEventListener("mousemove", function(e) {
-
-                    const rect = btn.getBoundingClientRect();
-                    const centerX = rect.left + rect.width / 2;
-                    const centerY = rect.top + rect.height / 2;
-
-                    const distX = Math.abs(e.clientX - centerX);
-                    const distY = Math.abs(e.clientY - centerY);
-
-                    
-                    mover();
-                    
+                // DISPARA AO ENCOSTAR O MOUSE
+                btn.addEventListener("mouseover", foge);
+                
+                // DISPARA AO CLICAR (CASO O MOUSEOVER FALHE EM ALTA VELOCIDADE)
+                btn.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    foge();
                 });
 
-                btn.addEventListener("touchstart", function(e) {
+                // DISPARA NO TOUCH (MOBILE)
+                btn.addEventListener("touchstart", (e) => {
                     e.preventDefault();
-                    mover();
+                    foge();
                 });
             }
-
-            init();
-
+            setup();
         })();
         </script>
     """, unsafe_allow_html=True)
 
-# -----------------------------
-# TELA DO SIM
-# -----------------------------
 elif st.session_state.page == "sim":
-    
+    # (O restante do código da tela do Sim permanece igual)
     st.markdown(f"""
         <div style="text-align: center;">
             <div style="display: inline-block; padding: 10px; background: white; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
