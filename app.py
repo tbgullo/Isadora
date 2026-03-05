@@ -2,7 +2,7 @@ import streamlit as st
 import base64
 import streamlit.components.v1 as components
 
-# Configuração da página - Essencial para remover margens padrão
+# Configuração da página para evitar margens laterais
 st.set_page_config(layout="wide", page_title="Convite Especial")
 
 # -----------------------------
@@ -27,71 +27,63 @@ if "page" not in st.session_state:
     st.session_state.page = "home"
 
 # -----------------------------
-# CSS PARA TRAVAR A TELA E ANIMAR
+# CSS PARA FIXAR O TAMANHO DA TELA (VIEWPORT)
 # -----------------------------
-st.markdown(f"""
+st.markdown("""
 <style>
-    /* Remove header, footer e trava o scroll completamente */
-    #MainMenu {{visibility: hidden;}}
-    footer {{visibility: hidden;}}
-    header {{visibility: hidden;}}
+    /* Esconde elementos padrão do Streamlit e trava o scroll */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
     
-    /* Trava o Streamlit para não permitir rolagem em nenhuma circunstância */
-    html, body, [data-testid="stAppViewContainer"] {{
-        overflow: hidden !important;
-        height: 100vh !important;
-        margin: 0;
-        padding: 0;
-        background-color: #fff0f5;
-    }}
-
-    .stApp {{
+    /* Força a página a ocupar exatamente o tamanho da tela do dispositivo */
+    .main .block-container {
+        padding-top: 2rem;
+        padding-bottom: 0rem;
         height: 100vh;
         overflow: hidden;
-    }}
+    }
 
-    /* Estilo do botão Sim (Nativo) */
-    .stButton > button {{
+    body {
+        overflow: hidden;
+        background-color: #fff0f5;
+    }
+
+    /* Estilo dos botões nativos */
+    .stButton > button {
         background-color: #ff4d6d !important;
         color: white !important;
-        border-radius: 12px !important;
-        padding: 15px 35px !important;
-        font-size: 20px !important;
+        border-radius: 10px !important;
+        padding: 10px 25px !important;
+        font-size: 18px !important;
         border: none !important;
         display: block;
-        margin: 30px auto 0 auto !important; /* Margem maior no topo para descer o botão */
-        transition: 0.4s;
-        box-shadow: 0px 4px 10px rgba(255, 77, 109, 0.3);
-    }}
-    
-    .stButton > button:hover {{
-        background-color: #e63950 !important;
-        transform: scale(1.1);
-    }}
+        margin: 0 auto;
+        transition: 0.3s;
+    }
 
-    /* Animação das fotos orbitando a tela (Sentido Horário) */
-    @keyframes orbit {{
-        0%   {{ top: 15px; left: 15px; }}
-        25%  {{ top: 15px; left: calc(100vw - 95px); }}
-        50%  {{ top: calc(100vh - 95px); left: calc(100vw - 95px); }}
-        75%  {{ top: calc(100vh - 95px); left: 15px; }}
-        100% {{ top: 15px; left: 15px; }}
-    }}
+    /* Animação das fotos (Sentido Horário Suave) */
+    @keyframes moveClockwise {
+        0%   { top: 10px; left: 10px; }
+        25%  { top: 10px; left: calc(100vw - 110px); }
+        50%  { top: calc(100vh - 110px); left: calc(100vw - 110px); }
+        75%  { top: calc(100vh - 110px); left: 10px; }
+        100% { top: 10px; left: 10px; }
+    }
 
-    .moving-img {{
+    .moving-img {
         position: fixed;
-        width: 80px; /* Tamanho reduzido como solicitado */
-        z-index: 9999;
-        border-radius: 50%; /* Deixa as fotos redondinhas para um visual mais delicado */
-        border: 3px solid #ff4d6d;
-        animation: orbit 30s linear infinite; /* Velocidade bem reduzida */
-    }}
+        width: 100px; /* Tamanho reduzido */
+        z-index: 999;
+        border-radius: 12px;
+        border: 2px solid #ff4d6d;
+        animation: moveClockwise 25s linear infinite; /* Velocidade menor */
+    }
 
-    /* Delay para distribuir as fotos nos 4 cantos */
-    .img-1 {{ animation-delay: 0s; }}
-    .img-2 {{ animation-delay: -7.5s; }}
-    .img-3 {{ animation-delay: -15s; }}
-    .img-4 {{ animation-delay: -22.5s; }}
+    .img-1 { animation-delay: 0s; }
+    .img-2 { animation-delay: -6.25s; }
+    .img-3 { animation-delay: -12.5s; }
+    .img-4 { animation-delay: -18.75s; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -100,43 +92,63 @@ st.markdown(f"""
 # -----------------------------
 if st.session_state.page == "home":
     
-    # Container centralizado
     st.markdown(f"""
-        <div style="text-align: center; margin-top: 8vh;">
-            <img src="data:image/jpg;base64,{img_home}" width="280" style="border-radius: 30px; box-shadow: 0px 10px 30px rgba(0,0,0,0.1);">
-            <h1 style="color: #ff4d6d; font-family: 'Segoe UI', Arial; margin-top: 20px;">Aceitas sair comigo na Sexta? 💖</h1>
+        <div style="text-align: center; height: 40vh; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+            <img src="data:image/jpg;base64,{img_home}" width="250" style="border-radius: 20px; box-shadow: 0px 4px 15px rgba(0,0,0,0.1);">
+            <h2 style="color: #ff4d6d; font-family: Arial; margin-top: 20px;">Aceitas sair comigo na Sexta? 💖</h2>
         </div>
     """, unsafe_allow_html=True)
 
-    # Botão Sim (Posicionado mais abaixo via CSS margin-top)
+    # Botão Sim Centralizado
     col1, col2, col3, col4, col5 = st.columns(5)
     with col3:
         if st.button("Sim 💘"):
             st.session_state.page = "sim"
             st.rerun()
 
-    # Botão "Não" (Iframe separado para não quebrar o layout)
+    # Botão "Não" que foge dentro da tela visível
     html_nao = f"""
+    <html>
+    <head>
     <style>
         .btn-nao {{
-            background-color: #ff4d6d; color: white; padding: 12px 28px;
-            font-size: 18px; border-radius: 10px; border: none;
-            cursor: pointer; position: fixed; z-index: 10000; font-family: Arial;
+            background-color: #ff4d6d;
+            color: white;
+            padding: 10px 25px;
+            font-size: 18px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            position: fixed;
+            z-index: 1000;
+            font-family: Arial;
         }}
     </style>
-    <button id="nao" class="btn-nao" style="top: 75%; left: 50%; transform: translateX(-50%);">Não 😢</button>
-    <script>
-        const btn = document.getElementById("nao");
-        btn.addEventListener("mouseover", () => {{
-            const x = Math.random() * (window.innerWidth - 120);
-            const y = Math.random() * (window.innerHeight - 60);
-            btn.style.left = x + "px";
-            btn.style.top = y + "px";
-            btn.style.transform = "none";
-        }});
-    </script>
+    </head>
+    <body>
+        <button id="nao" class="btn-nao" style="top: 65%; left: 50%; transform: translateX(-50%);">Não 😢</button>
+
+        <script>
+            const btnNao = document.getElementById("nao");
+            
+            btnNao.addEventListener("mouseover", () => {{
+                // Usa window.innerWidth/Height para garantir o limite da tela atual
+                const margin = 30;
+                const maxX = window.innerWidth - btnNao.offsetWidth - margin;
+                const maxY = window.innerHeight - btnNao.offsetHeight - margin;
+
+                const newX = Math.max(margin, Math.random() * maxX);
+                const newY = Math.max(margin, Math.random() * maxY);
+
+                btnNao.style.left = newX + "px";
+                btnNao.style.top = newY + "px";
+                btnNao.style.transform = "none";
+            }});
+        </script>
+    </body>
+    </html>
     """
-    components.html(html_nao, height=300)
+    components.html(html_nao, height=200) # Componente menor para não criar scroll
 
 # -----------------------------
 # TELA DO SIM
@@ -144,22 +156,22 @@ if st.session_state.page == "home":
 elif st.session_state.page == "sim":
     
     st.markdown(f"""
-        <div style="text-align: center; margin-top: 10vh;">
-            <img src="data:image/jpg;base64,{img_sim}" width="380" style="border-radius: 30px;">
-            <h1 style="color: #ff4d6d; margin-top: 20px;">Uma noite especial está por vir! ✨</h1>
-            <h3 style="color: #444;">Mal posso esperar para te ver ❤️</h3>
+        <div style="text-align: center; padding-top: 5vh;">
+            <img src="data:image/jpg;base64,{img_sim}" width="350" style="border-radius: 20px;">
+            <h1 style="color: #ff4d6d;">Vai ser uma noite cheia de surpresas! ✨</h1>
+            <h3 style="color: #333;">Para você não se esquecer da gente</h3>
         </div>
     """, unsafe_allow_html=True)
 
-    # Botão Voltar Centralizado
+    # Botão Voltar centralizado
+    st.write("") # Espaçamento
     col1, col2, col3, col4, col5 = st.columns(5)
     with col3:
-        st.write("<br>", unsafe_allow_html=True)
         if st.button("Voltar"):
             st.session_state.page = "home"
             st.rerun()
 
-    # Imagens Orbitando (Fixas na tela inicial do dispositivo)
+    # Imagens rodando sincronizadas com o tamanho da tela
     st.markdown(f"""
         <img src="data:image/jpg;base64,{img1}" class="moving-img img-1">
         <img src="data:image/jpg;base64,{img2}" class="moving-img img-2">
