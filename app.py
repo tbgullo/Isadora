@@ -31,7 +31,7 @@ if "page" not in st.session_state:
 # -----------------------------
 st.markdown(f"""
 <style>
-    /* Trava absoluta contra qualquer tipo de scroll */
+    /* Trava total contra rolagem */
     html, body, [data-testid="stAppViewContainer"], .main, .block-container {{
         overflow: hidden !important;
         height: 100vh !important;
@@ -45,6 +45,7 @@ st.markdown(f"""
         background: linear-gradient(135deg, #fff5f7 0%, #ffe4e1 100%);
     }}
     
+    /* Centralização Real do Conteúdo */
     .main .block-container {{
         display: flex;
         flex-direction: column;
@@ -60,7 +61,7 @@ st.markdown(f"""
         text-align: center;
     }}
 
-    /* Botões Sim e Voltar */
+    /* Estilo do Botão Sim (Streamlit) */
     .stButton > button {{
         background: linear-gradient(90deg, #ff4d6d, #ff758c) !important;
         color: white !important;
@@ -72,10 +73,10 @@ st.markdown(f"""
         box-shadow: 0 4px 10px rgba(255, 77, 109, 0.3) !important;
         width: 140px;
         transition: 0.3s;
-        transform: translateX(-80px); /* Ajuste para centralizar o conjunto visualmente no início */
+        /* Removemos o translate para ele ficar no centro exato */
     }}
 
-    /* Animação das fotos orbitando */
+    /* Fotos orbitando (Tela do Sim) */
     @keyframes moveClockwise {{
         0%   {{ top: 15px; left: 15px; }}
         25%  {{ top: 15px; left: calc(100vw - 100px); }}
@@ -93,11 +94,6 @@ st.markdown(f"""
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         animation: moveClockwise 30s linear infinite;
     }}
-
-    .img-1 {{ animation-delay: 0s; }}
-    .img-2 {{ animation-delay: -7.5s; }}
-    .img-3 {{ animation-delay: -15s; }}
-    .img-4 {{ animation-delay: -22.5s; }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -106,8 +102,9 @@ st.markdown(f"""
 # -----------------------------
 if st.session_state.page == "home":
     
+    # Imagem e Texto Centralizados
     st.markdown(f"""
-        <div style="text-align: center; margin-bottom: 20px;">
+        <div style="text-align: center; margin-bottom: 25px;">
             <div style="display: inline-block; padding: 10px; background: white; border-radius: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
                 <img src="data:image/jpg;base64,{img_home}" width="220" style="border-radius: 20px;">
             </div>
@@ -115,12 +112,14 @@ if st.session_state.page == "home":
         </div>
     """, unsafe_allow_html=True)
 
-    # Botão Sim centralizado (com offset no CSS para abrir espaço para o Não)
-    if st.button("Sim 💘"):
-        st.session_state.page = "sim"
-        st.rerun()
+    # Botão Sim (Centralizado pelo layout do Streamlit)
+    col1, col2, col3 = st.columns([1, 1, 1])
+    with col2:
+        if st.button("Sim 💘"):
+            st.session_state.page = "sim"
+            st.rerun()
 
-    # Botão "Não" GLOBAL que nasce ao lado do Sim
+    # Botão "Não" que nasce ao lado do Sim e foge por toda a tela
     html_nao_global = f"""
     <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999;">
         <button id="nao" style="
@@ -137,16 +136,16 @@ if st.session_state.page == "home":
             font-weight: bold;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             position: absolute;
-            /* ALINHAMENTO INICIAL: Lado a lado com o Sim */
-            left: calc(50% + 10px); 
-            top: 68.5%; 
-            transition: top 0.1s, left 0.1s;
+            /* Posicionamento Inicial ao lado do botão Sim */
+            left: calc(50% + 80px); 
+            top: 72%; 
+            transform: translateY(-50%);
+            transition: top 0.1s ease, left 0.1s ease;
         ">Não 😢</button>
     </div>
 
     <script>
         const btn = document.getElementById("nao");
-        let moved = false;
         
         btn.addEventListener("mouseover", () => {{
             const winW = window.innerWidth;
@@ -154,16 +153,14 @@ if st.session_state.page == "home":
             const btnW = 140;
             const btnH = 45;
 
-            let newX, newY;
-            
-            // Primeira fuga e subsequentes
-            newX = Math.random() * (winW - btnW - 40) + 20;
-            newY = Math.random() * (winH - btnH - 40) + 20;
+            // Gera posição aleatória na tela toda
+            let newX = Math.random() * (winW - btnW - 40) + 20;
+            let newY = Math.random() * (winH - btnH - 40) + 20;
 
-            // Restrição: Não deixar o botão parar em cima da imagem/botão sim (área central)
+            // Evita parar em cima da imagem central
             if (newX > winW * 0.3 && newX < winW * 0.7 && newY > winH * 0.3 && newY < winH * 0.7) {{
-                newX = newX < winW * 0.5 ? 40 : winW - btnW - 40;
-                newY = newY < winH * 0.5 ? 40 : winH - btnH - 40;
+                newX = newX < winW * 0.5 ? 50 : winW - btnW - 50;
+                newY = newY < winH * 0.5 ? 50 : winH - btnH - 50;
             }}
 
             btn.style.left = newX + "px";
@@ -188,14 +185,16 @@ elif st.session_state.page == "sim":
         </div>
     """, unsafe_allow_html=True)
 
-    if st.button("Voltar"):
-        st.session_state.page = "home"
-        st.rerun()
+    col1, col2, col3 = st.columns([1, 1, 1])
+    with col2:
+        if st.button("Voltar"):
+            st.session_state.page = "home"
+            st.rerun()
 
     # Imagens Orbitais
     st.markdown(f"""
-        <img src="data:image/jpg;base64,{img1}" class="moving-img img-1">
-        <img src="data:image/jpg;base64,{img2}" class="moving-img img-2">
-        <img src="data:image/jpg;base64,{img3}" class="moving-img img-3">
-        <img src="data:image/jpg;base64,{img4}" class="moving-img img-4">
+        <img src="data:image/jpg;base64,{img1}" class="moving-img" style="animation-delay: 0s;">
+        <img src="data:image/jpg;base64,{img2}" class="moving-img" style="animation-delay: -7.5s;">
+        <img src="data:image/jpg;base64,{img3}" class="moving-img" style="animation-delay: -15s;">
+        <img src="data:image/jpg;base64,{img4}" class="moving-img" style="animation-delay: -22.5s;">
     """, unsafe_allow_html=True)
