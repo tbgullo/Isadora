@@ -27,31 +27,30 @@ if "page" not in st.session_state:
     st.session_state.page = "home"
 
 # -----------------------------
-# CSS ESTILIZADO E TRAVA DE ROLAGEM
+# CSS ESTILIZADO E TRAVA DE ROLAGEM REAL
 # -----------------------------
 st.markdown(f"""
 <style>
-    /* Trava total contra rolagem e fixa o viewport */
-    html, body, [data-testid="stAppViewContainer"], .main {{
+    /* Trava absoluta contra qualquer tipo de scroll */
+    html, body, [data-testid="stAppViewContainer"], .main, .block-container {{
         overflow: hidden !important;
         height: 100vh !important;
         width: 100vw !important;
-        position: fixed;
-        margin: 0;
-        padding: 0;
+        margin: 0 !important;
+        padding: 0 !important;
+        position: fixed !important;
     }}
 
     [data-testid="stAppViewContainer"] {{
         background: linear-gradient(135deg, #fff5f7 0%, #ffe4e1 100%);
     }}
     
+    /* Centralização do conteúdo */
     .main .block-container {{
-        height: 100vh;
         display: flex;
         flex-direction: column;
         justify-content: center;
-        padding: 0 !important;
-        max-width: 100%;
+        align-items: center;
     }}
 
     #MainMenu, footer, header {{visibility: hidden;}}
@@ -60,6 +59,7 @@ st.markdown(f"""
         color: #d63384 !important;
         font-family: 'Segoe UI', Arial, sans-serif;
         text-align: center;
+        margin-bottom: 10px;
     }}
 
     /* Botões Sim e Voltar */
@@ -73,8 +73,7 @@ st.markdown(f"""
         border: none !important;
         box-shadow: 0 4px 10px rgba(255, 77, 109, 0.3) !important;
         width: 140px;
-        display: block;
-        margin: 0 auto;
+        transition: 0.3s;
     }}
 
     /* Animação das fotos orbitando */
@@ -117,16 +116,15 @@ if st.session_state.page == "home":
         </div>
     """, unsafe_allow_html=True)
 
-    # Colunas apenas para centralizar o Sim (o Não será injetado via HTML global)
     col1, col2, col3 = st.columns([1, 1, 1])
     with col2:
         if st.button("Sim 💘"):
             st.session_state.page = "sim"
             st.rerun()
 
-    # Injeção do botão "Não" de forma GLOBAL na página
+    # Botão "Não" GLOBAL sem gerar scroll
     html_nao_global = f"""
-    <div id="container-nao" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999;">
+    <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999;">
         <button id="nao" style="
             pointer-events: auto;
             background-color: #ffb6c1;
@@ -141,9 +139,8 @@ if st.session_state.page == "home":
             font-weight: bold;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             position: absolute;
-            left: 55%; /* Começa ao lado do botão sim */
-            top: 70%; /* Alinhado verticalmente com o botão sim */
-            transform: translateX(20px);
+            left: calc(50% + 80px); /* Posicionado à direita do botão Sim */
+            top: 72%;
             transition: 0.1s ease;
         ">Não 😢</button>
     </div>
@@ -155,29 +152,27 @@ if st.session_state.page == "home":
             const winW = window.innerWidth;
             const winH = window.innerHeight;
             
-            // Define o tamanho do botão para não vazar
+            // Define o tamanho do botão para garantir que ele fique na tela
             const btnW = 140;
             const btnH = 45;
 
-            // Gera posições aleatórias dentro de TODA a tela
+            // Gera novas coordenadas garantindo que o botão não saia da borda
             let newX = Math.random() * (winW - btnW - 20);
             let newY = Math.random() * (winH - btnH - 20);
 
-            // Evita que ele fique exatamente no meio (onde está o Sim e a Imagem)
-            // Se as coordenadas caírem no centro, empurramos para as bordas
-            if (newX > winW * 0.3 && newX < winW * 0.7 && newY > winH * 0.3 && newY < winH * 0.7) {{
-                newX = newX < winW * 0.5 ? 50 : winW - btnW - 50;
-                newY = newY < winH * 0.5 ? 50 : winH - btnH - 50;
+            // Evita a zona central (onde estão imagem e botão Sim)
+            if (newX > winW * 0.25 && newX < winW * 0.75 && newY > winH * 0.25 && newY < winH * 0.75) {{
+                newX = newX < winW * 0.5 ? 20 : winW - btnW - 20;
+                newY = newY < winH * 0.5 ? 20 : winH - btnH - 20;
             }}
 
             btn.style.left = newX + "px";
             btn.style.top = newY + "px";
-            btn.style.transform = "none";
         }});
     </script>
     """
-    # Usamos o components.html mas com altura 0 ou ocupando a tela toda de forma invisível
-    components.html(html_nao_global, height=1000)
+    # Altura definida como 0 para não criar barra de rolagem
+    components.html(html_nao_global, height=0)
 
 # -----------------------------
 # TELA DO SIM
@@ -190,7 +185,7 @@ elif st.session_state.page == "sim":
                 <img src="data:image/jpg;base64,{img_sim}" width="320" style="border-radius: 20px;">
             </div>
             <h1 style="margin-top: 20px;">Vai ser uma noite memorável! ✨</h1>
-            <h3 style="color: #666; margin-bottom: 10px;">Para você nunca se esquecer de mim ❤️</h3>
+            <h3 style="color: #666;">Para você nunca se esquecer de mim ❤️</h3>
         </div>
     """, unsafe_allow_html=True)
 
