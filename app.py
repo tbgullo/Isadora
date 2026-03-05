@@ -37,6 +37,7 @@ st.markdown(f"""
         width: 100vw !important;
         margin: 0 !important;
         padding: 0 !important;
+        position: fixed !important;
     }}
 
     [data-testid="stAppViewContainer"] {{
@@ -68,6 +69,7 @@ st.markdown(f"""
         border: none !important;
         box-shadow: 0 4px 10px rgba(255, 77, 109, 0.3) !important;
         width: 140px;
+        z-index: 10;
     }}
 
     /* Botão Não (Injetado) */
@@ -85,23 +87,11 @@ st.markdown(f"""
         font-weight: bold;
         box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         z-index: 999999;
-        /* Posição Inicial ao lado do Sim */
-        left: calc(50% + 10px);
+        /* Alinhamento inicial */
+        left: calc(50% + 15px);
         top: 72%;
         transform: translateY(-50%);
-        transition: 0.1s ease;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }}
-
-    /* Fotos orbitando */
-    @keyframes moveClockwise {{
-        0%   {{ top: 15px; left: 15px; }}
-        25%  {{ top: 15px; left: calc(100vw - 100px); }}
-        50%  {{ top: calc(100vh - 100px); left: calc(100vw - 100px); }}
-        75%  {{ top: calc(100vh - 100px); left: 15px; }}
-        100% {{ top: 15px; left: 15px; }}
+        transition: all 0.15s ease-out;
     }}
 
     .moving-img {{
@@ -112,6 +102,14 @@ st.markdown(f"""
         border: 3px solid white;
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         animation: moveClockwise 30s linear infinite;
+    }}
+
+    @keyframes moveClockwise {{
+        0%   {{ top: 15px; left: 15px; }}
+        25%  {{ top: 15px; left: calc(100vw - 100px); }}
+        50%  {{ top: calc(100vh - 100px); left: calc(100vw - 100px); }}
+        75%  {{ top: calc(100vh - 100px); left: 15px; }}
+        100% {{ top: 15px; left: 15px; }}
     }}
 </style>
 """, unsafe_allow_html=True)
@@ -130,39 +128,55 @@ if st.session_state.page == "home":
         </div>
     """, unsafe_allow_html=True)
 
-    # Botão Sim - Centralizado manualmente movendo o container para a esquerda um pouco
     col1, col2, col3 = st.columns([1, 1, 1])
     with col2:
-        # Criamos um espaço para o botão sim ficar levemente à esquerda do centro
-        st.markdown('<div style="transform: translateX(-75px);">', unsafe_allow_html=True)
+        # Desloca o Sim para a esquerda para abrir espaço para o Não ao lado
+        st.markdown('<div style="transform: translateX(-80px);">', unsafe_allow_html=True)
         if st.button("Sim 💘"):
             st.session_state.page = "sim"
             st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # Injeção Direta do Botão "Não" e do Script de Movimento
+    # Injeção do Botão "Não" e Script Robusto
     st.markdown("""
-        <button id="nao-button" onmouseover="foge()">Não 😢</button>
+        <button id="nao-button">Não 😢</button>
         
         <script>
-            function foge() {
-                const btn = document.getElementById("nao-button");
+            const btn = document.getElementById("nao-button");
+
+            const foge = () => {
+                // Pega a largura e altura real da janela do navegador no momento
                 const winW = window.innerWidth;
                 const winH = window.innerHeight;
                 
-                // Limites para não sumir da tela
-                let newX = Math.random() * (winW - 160) + 10;
-                let newY = Math.random() * (winH - 60) + 10;
+                const btnW = 140;
+                const btnH = 45;
                 
-                // Evitar o centro (onde está a imagem)
+                // Calcula posições máximas seguras
+                const maxLeft = winW - btnW - 20;
+                const maxTop = winH - btnH - 20;
+                
+                let newX = Math.floor(Math.random() * maxLeft);
+                let newY = Math.floor(Math.random() * maxTop);
+                
+                // Garante que o botão não saia da tela (mínimo de 10px da borda)
+                newX = Math.max(10, newX);
+                newY = Math.max(10, newY);
+                
+                // Se cair na área central (onde estão os botões e imagem), empurra pra borda
                 if (newX > winW * 0.3 && newX < winW * 0.7 && newY > winH * 0.3 && newY < winH * 0.7) {
-                    newX = newX < winW * 0.5 ? 50 : winW - 160;
-                    newY = newY < winH * 0.5 ? 50 : winH - 60;
+                    newX = 20;
+                    newY = 20;
                 }
-                
+
                 btn.style.left = newX + "px";
                 btn.style.top = newY + "px";
-            }
+            };
+
+            // Adiciona o evento de passar o mouse
+            btn.addEventListener("mouseover", foge);
+            // Adiciona evento de clique (caso alguém seja muito rápido)
+            btn.addEventListener("click", foge);
         </script>
     """, unsafe_allow_html=True)
 
